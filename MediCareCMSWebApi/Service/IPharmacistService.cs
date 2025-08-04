@@ -4,25 +4,40 @@ namespace MediCareCMSWebApi.Service
 {
     public interface IPharmacistService
     {
-        // ---------------- Medicines ----------------
+        #region AddMedicine
 
         Task AddMedicineAsync(MedicineViewModel model);
+
+        #endregion
+
+        #region GetMedicineById
+
         Task<MedicineViewModel?> GetMedicineByIdAsync(int id);
 
+        #endregion
 
-        // ---------------- Prescriptions ----------------
+        #region GetAllPrescriptions
 
         Task<IEnumerable<PrescriptionViewModel>> GetAllPrescriptionsAsync();
+
+        #endregion
+
+        #region GetPrescriptionById
+
         Task<PrescriptionViewModel?> GetPrescriptionByIdAsync(int id);
 
+        #endregion
 
-        // ---------------- Patient History ----------------
+        #region GetPatientHistory
 
         Task<IEnumerable<PatientHistoryViewModel>> GetPatientHistoryAsync(int patientId);
 
+        #endregion
 
-        // ---------------- Pharmacy Bill ----------------
+        #region GenerateBill
 
         Task GenerateBillAsync(PharmacyBillViewModel billModel);
+
+        #endregion
     }
 }

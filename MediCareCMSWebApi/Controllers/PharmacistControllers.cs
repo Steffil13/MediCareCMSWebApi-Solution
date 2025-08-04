@@ -11,12 +11,16 @@ namespace MediCareCMSWebApi.Controllers
     {
         private readonly IPharmacistService _pharmacistService;
 
+        #region Constructor
+
         public PharmacistControllers(IPharmacistService pharmacistService)
         {
             _pharmacistService = pharmacistService;
         }
 
-        // ---------------- Medicines ----------------
+        #endregion
+
+        #region AddMedicine
 
         [HttpPost("medicine")]
         public async Task<IActionResult> AddMedicine([FromBody] MedicineViewModel model)
@@ -24,6 +28,10 @@ namespace MediCareCMSWebApi.Controllers
             await _pharmacistService.AddMedicineAsync(model);
             return Ok("Medicine added successfully.");
         }
+
+        #endregion
+
+        #region GetMedicineById
 
         [HttpGet("medicine/{id}")]
         public async Task<IActionResult> GetMedicineById(int id)
@@ -33,7 +41,9 @@ namespace MediCareCMSWebApi.Controllers
             return Ok(medicine);
         }
 
-        // ---------------- Prescriptions ----------------
+        #endregion
+
+        #region GetAllPrescriptions
 
         [HttpGet("prescriptions")]
         public async Task<IActionResult> GetAllPrescriptions()
@@ -41,6 +51,10 @@ namespace MediCareCMSWebApi.Controllers
             var prescriptions = await _pharmacistService.GetAllPrescriptionsAsync();
             return Ok(prescriptions);
         }
+
+        #endregion
+
+        #region GetPrescriptionById
 
         [HttpGet("prescription/{id}")]
         public async Task<IActionResult> GetPrescriptionById(int id)
@@ -50,7 +64,9 @@ namespace MediCareCMSWebApi.Controllers
             return Ok(prescription);
         }
 
-        // ---------------- Patient History ----------------
+        #endregion
+
+        #region GetPatientHistory
 
         [HttpGet("history/{patientId}")]
         public async Task<IActionResult> GetPatientHistory(int patientId)
@@ -59,7 +75,9 @@ namespace MediCareCMSWebApi.Controllers
             return Ok(history);
         }
 
-        // ---------------- Pharmacy Bill ----------------
+        #endregion
+
+        #region GeneratePharmacyBill
 
         [HttpPost("bill")]
         public async Task<IActionResult> GeneratePharmacyBill([FromBody] PharmacyBillViewModel model)
@@ -67,5 +85,7 @@ namespace MediCareCMSWebApi.Controllers
             await _pharmacistService.GenerateBillAsync(model);
             return Ok("Pharmacy bill generated successfully.");
         }
+
+        #endregion
     }
 }

@@ -36,7 +36,7 @@ namespace MediCareCMSWebApi
             // Repository & Service Registrations
             builder.Services.AddScoped<ILoginRepository, LoginRepository>();
             builder.Services.AddScoped<ILoginService, LoginService>();
-
+            // Repository & Service for Pharmacist
             builder.Services.AddScoped<IPharmacistRepository, PharmacistRepository>();
             builder.Services.AddScoped<IPharmacistService, PharmacistService>();
 

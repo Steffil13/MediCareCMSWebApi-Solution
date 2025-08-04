@@ -14,7 +14,7 @@ namespace MediCareCMS.Service.Services
             _pharmacistRepository = pharmacistRepository;
         }
 
-        // ---------------- Medicines ----------------
+        #region AddMedicine
 
         public async Task AddMedicineAsync(MedicineViewModel model)
         {
@@ -31,6 +31,9 @@ namespace MediCareCMS.Service.Services
             await _pharmacistRepository.AddMedicineAsync(medicine);
         }
 
+        #endregion
+
+        #region GetMedicineById
 
         public async Task<MedicineViewModel?> GetMedicineByIdAsync(int id)
         {
@@ -49,8 +52,9 @@ namespace MediCareCMS.Service.Services
             };
         }
 
+        #endregion
 
-        // ---------------- Prescriptions ----------------
+        #region GetAllPrescriptions
 
         public async Task<IEnumerable<PrescriptionViewModel>> GetAllPrescriptionsAsync()
         {
@@ -70,6 +74,9 @@ namespace MediCareCMS.Service.Services
             }).ToList();
         }
 
+        #endregion
+
+        #region GetPrescriptionById
 
         public async Task<PrescriptionViewModel?> GetPrescriptionByIdAsync(int id)
         {
@@ -84,15 +91,15 @@ namespace MediCareCMS.Service.Services
                 DatePrescribed = prescription.CreatedDate ?? DateTime.MinValue,
                 Medicines = prescription.PrescribedMedicines.Select(m => new PrescribedMedicineViewModel
                 {
-                    MedicineName = m.Medicine?.MedicineName ?? "N/A", 
+                    MedicineName = m.Medicine?.MedicineName ?? "N/A",
                     Dosage = m.Dosage ?? "N/A"
                 }).ToList()
             };
         }
 
+        #endregion
 
-
-        // ---------------- Patient History ----------------
+        #region GetPatientHistory
 
         public async Task<IEnumerable<PatientHistoryViewModel>> GetPatientHistoryAsync(int patientId)
         {
@@ -105,15 +112,14 @@ namespace MediCareCMS.Service.Services
                 AppointmentId = h.AppointmentId ?? 0,
                 PrescriptionId = h.PrescriptionId ?? 0,
                 MedicineName = h.Pmedicine?.Medicine?.MedicineName ?? "N/A",
-                LabTestName = h.PlabTest?.Lab?.LabName ?? "N/A",  
-                TestResult = h.TestResult?.ResultValue ?? "Pending"  
+                LabTestName = h.PlabTest?.Lab?.LabName ?? "N/A",
+                TestResult = h.TestResult?.ResultValue ?? "Pending"
             }).ToList();
         }
 
+        #endregion
 
-
-
-        // ---------------- Pharmacy Bill ----------------
+        #region GenerateBill
 
         public async Task GenerateBillAsync(PharmacyBillViewModel billModel)
         {
@@ -131,5 +137,6 @@ namespace MediCareCMS.Service.Services
             await _pharmacistRepository.GeneratePharmacyBillAsync(bill);
         }
 
+        #endregion
     }
 }

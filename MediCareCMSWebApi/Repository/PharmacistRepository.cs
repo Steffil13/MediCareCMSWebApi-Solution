@@ -13,7 +13,7 @@ namespace MediCareCMSWebApi.Repositories
             _context = context;
         }
 
-        // ---------------- Medicines ----------------
+        #region AddMedicine
 
         public async Task AddMedicineAsync(MedicineInventory medicine)
         {
@@ -21,12 +21,18 @@ namespace MediCareCMSWebApi.Repositories
             await _context.SaveChangesAsync();
         }
 
+        #endregion
+
+        #region GetMedicineById
+
         public async Task<MedicineInventory?> GetMedicineByIdAsync(int id)
         {
             return await _context.MedicineInventories.FindAsync(id);
         }
 
-        // ---------------- Prescriptions ----------------
+        #endregion
+
+        #region GetAllPrescriptions
 
         public async Task<IEnumerable<Prescription>> GetAllPrescriptionsAsync()
         {
@@ -37,6 +43,10 @@ namespace MediCareCMSWebApi.Repositories
                 .ToListAsync();
         }
 
+        #endregion
+
+        #region GetPrescriptionById
+
         public async Task<Prescription?> GetPrescriptionByIdAsync(int id)
         {
             return await _context.Prescriptions
@@ -46,7 +56,9 @@ namespace MediCareCMSWebApi.Repositories
                 .FirstOrDefaultAsync(p => p.PrescriptionId == id);
         }
 
-        // ---------------- Patient History ----------------
+        #endregion
+
+        #region GetPatientHistory
 
         public async Task<IEnumerable<PatientHistory>> GetPatientHistoryAsync(int patientId)
         {
@@ -60,12 +72,16 @@ namespace MediCareCMSWebApi.Repositories
                 .ToListAsync();
         }
 
-        // ---------------- Pharmacy Bill ----------------
+        #endregion
+
+        #region GeneratePharmacyBill
 
         public async Task GeneratePharmacyBillAsync(PharmacyBill bill)
         {
             await _context.PharmacyBills.AddAsync(bill);
             await _context.SaveChangesAsync();
         }
+
+        #endregion
     }
 }

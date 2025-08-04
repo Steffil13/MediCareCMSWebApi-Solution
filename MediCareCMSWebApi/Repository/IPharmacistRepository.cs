@@ -4,21 +4,40 @@ namespace MediCareCMSWebApi.Repository
 {
     public interface IPharmacistRepository
     {
-        // ---------------- Medicines ----------------
+        #region AddMedicine
+
         Task AddMedicineAsync(MedicineInventory medicine);
+
+        #endregion
+
+        #region GetMedicineById
+
         Task<MedicineInventory?> GetMedicineByIdAsync(int id);
 
+        #endregion
 
-        // ---------------- Prescriptions ----------------
+        #region GetAllPrescriptions
+
         Task<IEnumerable<Prescription>> GetAllPrescriptionsAsync();
+
+        #endregion
+
+        #region GetPrescriptionById
+
         Task<Prescription?> GetPrescriptionByIdAsync(int id);
 
+        #endregion
 
-        // ---------------- Patient History ----------------
+        #region GetPatientHistory
+
         Task<IEnumerable<PatientHistory>> GetPatientHistoryAsync(int patientId);
 
+        #endregion
 
-        // ---------------- Pharmacy Bill ----------------
+        #region GeneratePharmacyBill
+
         Task GeneratePharmacyBillAsync(PharmacyBill bill);
+
+        #endregion
     }
 }
