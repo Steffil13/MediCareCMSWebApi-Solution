@@ -1,6 +1,4 @@
-using MediCareCMS.Service.Services;
 using MediCareCMSWebApi.Models;
-using MediCareCMSWebApi.Repositories;
 using MediCareCMSWebApi.Repository;
 using MediCareCMSWebApi.Service;
 using Microsoft.EntityFrameworkCore;
