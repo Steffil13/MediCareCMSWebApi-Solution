@@ -138,5 +138,37 @@ namespace MediCareCMS.Service.Services
         }
 
         #endregion
+
+        #region IssueMedicine
+
+        public async Task<bool> IssueMedicineAsync(int prescribedMedicineId)
+        {
+            var prescribedMedicine = await _pharmacistRepository.GetPrescribedMedicineByIdAsync(prescribedMedicineId);
+
+            if (prescribedMedicine == null || prescribedMedicine.IsIssued == true)
+                return false;
+
+            var medicine = prescribedMedicine.Medicine;
+            if (medicine == null || medicine.Quantity == null || medicine.Quantity <= 0)
+                return false;
+
+            // Deduct quantity
+            medicine.Quantity -= 1;
+
+            // Update availability
+            medicine.Availability = medicine.Quantity > 0;
+
+            // Mark as issued
+            prescribedMedicine.IsIssued = true;
+
+            // Update both
+            await _pharmacistRepository.UpdateMedicineInventoryAsync(medicine);
+            await _pharmacistRepository.UpdatePrescribedMedicineAsync(prescribedMedicine);
+
+            return true;
+        }
+
+        #endregion
+
     }
 }

@@ -4,6 +4,7 @@ using MediCareCMSWebApi.Repositories;
 using MediCareCMSWebApi.Repository;
 using MediCareCMSWebApi.Service;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 
 namespace MediCareCMSWebApi
 {
@@ -14,8 +15,12 @@ namespace MediCareCMSWebApi
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-
-            builder.Services.AddControllers();
+            builder.Services.AddControllers().AddJsonOptions(options =>
+            {
+                // This fixes the circular reference serialization issue
+                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+                options.JsonSerializerOptions.WriteIndented = true;
+            });
 
             // CORS policy
             builder.Services.AddCors(options =>
@@ -23,22 +28,28 @@ namespace MediCareCMSWebApi
                 options.AddPolicy("AllowAllOrigin", builder =>
                 {
                     builder.WithOrigins("http://localhost:4200")
-                    .AllowAnyMethod()
-                    .AllowAnyHeader()
-                    .AllowCredentials();
+                           .AllowAnyMethod()
+                           .AllowAnyHeader()
+                           .AllowCredentials();
                 });
             });
 
-            builder.Services.AddDbContext<MediCareDbContext>(
-                options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+            // Database context
+            builder.Services.AddDbContext<MediCareDbContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
             );
 
-            // Repository & Service Registrations
+            // Repository & Service for Login
             builder.Services.AddScoped<ILoginRepository, LoginRepository>();
             builder.Services.AddScoped<ILoginService, LoginService>();
+
             // Repository & Service for Pharmacist
             builder.Services.AddScoped<IPharmacistRepository, PharmacistRepository>();
             builder.Services.AddScoped<IPharmacistService, PharmacistService>();
+
+            // Repository & Service for Lab Technician
+            builder.Services.AddScoped<ILabTechnicianRepository, LabTechnicianRepository>();
+            builder.Services.AddScoped<ILabTechnicianService, LabTechnicianService>();
 
             // Swagger
             builder.Services.AddSwaggerGen();

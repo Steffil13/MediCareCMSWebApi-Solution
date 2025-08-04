@@ -87,5 +87,17 @@ namespace MediCareCMSWebApi.Controllers
         }
 
         #endregion
+
+        [HttpPut("issue-medicine/{prescribedMedicineId}")]
+        public async Task<IActionResult> IssueMedicine(int prescribedMedicineId)
+        {
+            var result = await _pharmacistService.IssueMedicineAsync(prescribedMedicineId);
+
+            if (!result)
+                return BadRequest("Unable to issue medicine. Either already issued or insufficient stock.");
+
+            return Ok("Medicine issued successfully and stock updated.");
+        }
+
     }
 }

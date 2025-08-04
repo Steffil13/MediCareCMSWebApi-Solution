@@ -39,5 +39,10 @@ namespace MediCareCMSWebApi.Service
         Task GenerateBillAsync(PharmacyBillViewModel billModel);
 
         #endregion
+
+        Task<bool> IssueMedicineAsync(int prescribedMedicineId);
+
+
+
     }
 }
