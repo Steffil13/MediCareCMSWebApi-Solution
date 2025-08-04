@@ -2,7 +2,7 @@
 using MediCareCMSWebApi.Repository;
 using Microsoft.EntityFrameworkCore;
 
-namespace MediCareCMSWebApi.Repositories
+namespace MediCareCMSWebApi.Repository
 {
     public class PharmacistRepository : IPharmacistRepository
     {

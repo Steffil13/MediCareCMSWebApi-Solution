@@ -3,7 +3,7 @@ using MediCareCMSWebApi.Repository;
 using MediCareCMSWebApi.Service;
 using MediCareCMSWebApi.ViewModels;
 
-namespace MediCareCMS.Service.Services
+namespace MediCareCMSWebApi.Service
 {
     public class PharmacistService : IPharmacistService
     {
