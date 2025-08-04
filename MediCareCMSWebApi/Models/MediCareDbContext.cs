@@ -23,6 +23,9 @@ public partial class MediCareDbContext : DbContext
 
     public virtual DbSet<Doctor> Doctors { get; set; }
 
+    public DbSet<LabBill> LabBills { get; set; }
+
+
     public virtual DbSet<DoctorSchedule> DoctorSchedules { get; set; }
 
     public virtual DbSet<LabInventory> LabInventories { get; set; }

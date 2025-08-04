@@ -83,5 +83,32 @@ namespace MediCareCMSWebApi.Repositories
         }
 
         #endregion
+
+        #region IssueMedicine - Helpers
+
+        public async Task<PrescribedMedicine?> GetPrescribedMedicineByIdAsync(int id)
+        {
+            return await _context.PrescribedMedicines
+                .Include(pm => pm.Medicine)
+                .FirstOrDefaultAsync(pm => pm.PmedicineId == id);
+        }
+
+        public async Task UpdatePrescribedMedicineAsync(PrescribedMedicine prescribedMedicine)
+        {
+            _context.PrescribedMedicines.Update(prescribedMedicine);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateMedicineInventoryAsync(MedicineInventory medicine)
+        {
+            _context.MedicineInventories.Update(medicine);
+            await _context.SaveChangesAsync();
+        }
+
+        #endregion
+
+
+
+
     }
 }
