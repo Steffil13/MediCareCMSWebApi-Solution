@@ -1,4 +1,6 @@
+using MediCareCMS.Service.Services;
 using MediCareCMSWebApi.Models;
+using MediCareCMSWebApi.Repositories;
 using MediCareCMSWebApi.Repository;
 using MediCareCMSWebApi.Service;
 using Microsoft.EntityFrameworkCore;
@@ -14,8 +16,8 @@ namespace MediCareCMSWebApi
             // Add services to the container.
 
             builder.Services.AddControllers();
-            //cors policy
 
+            // CORS policy
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowAllOrigin", builder =>
@@ -30,30 +32,32 @@ namespace MediCareCMSWebApi
             builder.Services.AddDbContext<MediCareDbContext>(
                 options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
             );
+
+            // Repository & Service Registrations
             builder.Services.AddScoped<ILoginRepository, LoginRepository>();
             builder.Services.AddScoped<ILoginService, LoginService>();
 
-            //swagger 
+            builder.Services.AddScoped<IPharmacistRepository, PharmacistRepository>();
+            builder.Services.AddScoped<IPharmacistService, PharmacistService>();
+
+            // Swagger
             builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
 
-            //swagger
+            // Swagger UI for development
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
 
-            //Enable CORS
+            // Enable CORS
             app.UseCors("AllowAllOrigin");
-
-            // Configure the HTTP request pipeline.
 
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-
 
             app.MapControllers();
 
