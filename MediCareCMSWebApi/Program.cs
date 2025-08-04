@@ -32,6 +32,9 @@ namespace MediCareCMSWebApi
             );
             builder.Services.AddScoped<ILoginRepository, LoginRepository>();
             builder.Services.AddScoped<ILoginService, LoginService>();
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<IUserService, UserService>();
+
 
             //swagger 
             builder.Services.AddSwaggerGen();
