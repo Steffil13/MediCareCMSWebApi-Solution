@@ -39,5 +39,10 @@ namespace MediCareCMSWebApi.Repository
         Task GeneratePharmacyBillAsync(PharmacyBill bill);
 
         #endregion
+
+        Task<PrescribedMedicine?> GetPrescribedMedicineByIdAsync(int id);
+        Task UpdatePrescribedMedicineAsync(PrescribedMedicine prescribedMedicine);
+        Task UpdateMedicineInventoryAsync(MedicineInventory medicine);
+
     }
 }

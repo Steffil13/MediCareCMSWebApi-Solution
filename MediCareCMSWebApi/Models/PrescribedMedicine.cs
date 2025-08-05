@@ -15,6 +15,8 @@ public partial class PrescribedMedicine
 
     public string? Duration { get; set; }
 
+    public bool? IsIssued { get; set; }
+
     public virtual MedicineInventory Medicine { get; set; } = null!;
 
     public virtual ICollection<PatientHistory> PatientHistories { get; set; } = new List<PatientHistory>();
