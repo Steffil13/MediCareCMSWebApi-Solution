@@ -111,5 +111,30 @@ namespace MediCareCMSWebApi.Service
                 .ToListAsync();
         }
         #endregion
+
+        #region bill
+
+        public async Task GenerateLabBillAsync(LabBillViewModel billModel)
+        {
+            var bill = new LabBill
+            {
+                LabBillNumber = $"LABBILL-{DateTime.Now:yyyyMMddHHmmss}",
+                PrescriptionId = billModel.PrescriptionId,
+                LabTechnicianId = billModel.LabTechnicianId,
+                PatientId = billModel.PatientId,
+                DoctorId = billModel.DoctorId,
+                TotalAmount = billModel.TotalAmount,
+                IssuedDate = DateTime.Now,
+                IsPaid = true
+            };
+
+            await _context.LabBills.AddAsync(bill);
+            await _context.SaveChangesAsync();
+        }
+#endregion
+
+
+
+
     }
 }
