@@ -42,13 +42,7 @@ namespace MediCareCMSWebApi.Repository
         }
         #endregion
 
-        #region Update Lab Test Result
-        public async Task UpdateLabTestResultAsync(TestResult result)
-        {
-            _context.TestResults.Update(result);
-            await _context.SaveChangesAsync();
-        }
-        #endregion
+
 
         #region View Patient Lab History
         public async Task<IEnumerable<PatientHistory>> GetPatientLabHistoryAsync(int patientId)
