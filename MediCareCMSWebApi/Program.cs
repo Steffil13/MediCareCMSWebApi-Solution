@@ -49,6 +49,10 @@ namespace MediCareCMSWebApi
             builder.Services.AddScoped<ILabTechnicianRepository, LabTechnicianRepository>();
             builder.Services.AddScoped<ILabTechnicianService, LabTechnicianService>();
 
+            // Repository & Service for User
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<IUserService, UserService>();
+
             // Swagger
             builder.Services.AddSwaggerGen();
 
