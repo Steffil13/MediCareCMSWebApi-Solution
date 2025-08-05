@@ -1,4 +1,5 @@
-﻿using MediCareCMSWebApi.ViewModel;
+﻿using MediCareCMSWebApi.Models;
+using MediCareCMSWebApi.ViewModel;
 using Microsoft.Data.SqlClient;
 using System.Data;
 
@@ -201,6 +202,45 @@ namespace MediCareCMSWebApi.Repository
             }
 
             return user;
+        }
+
+        public List<Department> GetAllDepartments()
+        {
+            var departments = new List<Department>();
+            using (SqlConnection con = new SqlConnection(_connectionString))
+            using (SqlCommand cmd = new SqlCommand("sp_GetAllDepartments", con))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+                con.Open();
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        departments.Add(new Department
+                        {
+                            DepartmentId = (int)reader["DepartmentId"],
+                            DepartmentName = reader["DepartmentName"] as string,
+                            DoctorFee = reader["DoctorFee"] as decimal?
+                        });
+                    }
+                }
+            }
+            return departments;
+        }
+
+        public int AddDepartment(string? departmentName, decimal? doctorFee)
+        {
+            using (SqlConnection con = new SqlConnection(_connectionString))
+            using (SqlCommand cmd = new SqlCommand("sp_AddDepartment", con))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@DepartmentName", departmentName ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@DoctorFee", doctorFee ?? (object)DBNull.Value);
+
+                con.Open();
+                var result = cmd.ExecuteScalar();
+                return Convert.ToInt32(result);
+            }
         }
 
 

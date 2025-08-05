@@ -16,7 +16,7 @@ namespace MediCareCMSWebApi
             builder.Services.AddControllers().AddJsonOptions(options =>
             {
                 // This fixes the circular reference serialization issue
-                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
                 options.JsonSerializerOptions.WriteIndented = true;
             });
 

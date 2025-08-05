@@ -1,4 +1,5 @@
-﻿using MediCareCMSWebApi.Service;
+﻿using MediCareCMSWebApi.Models;
+using MediCareCMSWebApi.Service;
 using MediCareCMSWebApi.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 
@@ -92,6 +93,26 @@ namespace ClinicalManagementSystem.Controllers
             if (user == null) return NotFound();
 
             return Ok(user);
+        }
+
+        // GET: api/admin/departments
+        [HttpGet("departments")]
+        public ActionResult<List<Department>> GetAllDepartments()
+        {
+            var departments = _userService.GetAllDepartments();
+            return Ok(departments);
+        }
+
+        // POST: api/admin/departments
+        [HttpPost("departments")]
+        public ActionResult AddDepartment([FromBody] DepartmentInputModel input)
+        {
+            if (input == null || string.IsNullOrWhiteSpace(input.DepartmentName))
+                return BadRequest("Department name is required.");
+
+            var newDepartmentId = _userService.AddDepartment(input.DepartmentName, input.DoctorFee);
+
+            return CreatedAtAction(nameof(GetAllDepartments), new { id = newDepartmentId }, new { DepartmentId = newDepartmentId });
         }
 
 

@@ -1,4 +1,5 @@
-﻿using MediCareCMSWebApi.Repository;
+﻿using MediCareCMSWebApi.Models;
+using MediCareCMSWebApi.Repository;
 using MediCareCMSWebApi.ViewModel;
 
 namespace MediCareCMSWebApi.Service
@@ -34,6 +35,15 @@ namespace MediCareCMSWebApi.Service
         public UserInputModel? GetUserById(int id)
         {
             return _userRepository.GetUserById(id);
+        }
+        public List<Department> GetAllDepartments()
+        {
+            return _userRepository.GetAllDepartments();
+        }
+
+        public int AddDepartment(string? departmentName, decimal? doctorFee)
+        {
+            return _userRepository.AddDepartment(departmentName, doctorFee);
         }
 
     }
