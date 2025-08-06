@@ -22,6 +22,8 @@ public partial class Prescription
 
     public virtual Appointment Appointment { get; set; } = null!;
 
+    public virtual ICollection<LabBill> LabBills { get; set; } = new List<LabBill>();
+
     public virtual ICollection<PatientHistory> PatientHistories { get; set; } = new List<PatientHistory>();
 
     public virtual ICollection<PharmacyBill> PharmacyBills { get; set; } = new List<PharmacyBill>();

@@ -19,7 +19,7 @@ namespace MediCareCMSWebApi
             builder.Services.AddControllers().AddJsonOptions(options =>
             {
                 // This fixes the circular reference serialization issue
-                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
                 options.JsonSerializerOptions.WriteIndented = true;
             });
 
@@ -55,6 +55,13 @@ namespace MediCareCMSWebApi
             // Repository & Service for User
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IUserService, UserService>();
+            // Repository & Service for patient
+            builder.Services.AddScoped<IPatientRepository, PatientRepository>();
+            builder.Services.AddScoped<IPatientService, PatientService>();
+            //repository & Service for bill
+            builder.Services.AddScoped<IBillingRepository, BillingRepository>();
+            builder.Services.AddScoped<IBillingService, BillingService>();
+
 
             //Repository & Service for Doctor
             builder.Services.AddScoped<IDoctorRepository, DoctorRepository>();

@@ -23,10 +23,9 @@ public partial class MediCareDbContext : DbContext
 
     public virtual DbSet<Doctor> Doctors { get; set; }
 
-    public DbSet<LabBill> LabBills { get; set; }
-
-
     public virtual DbSet<DoctorSchedule> DoctorSchedules { get; set; }
+
+    public virtual DbSet<LabBill> LabBills { get; set; }
 
     public virtual DbSet<LabInventory> LabInventories { get; set; }
 
@@ -64,6 +63,8 @@ public partial class MediCareDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.UseCollation("Latin1_General_CI_AS");
+
         modelBuilder.Entity<Appointment>(entity =>
         {
             entity.HasKey(e => e.AppointmentId).HasName("PK__Appointm__8ECDFCC243338EF7");
@@ -84,8 +85,7 @@ public partial class MediCareDbContext : DbContext
 
             entity.HasOne(d => d.Patient).WithMany(p => p.Appointments)
                 .HasForeignKey(d => d.PatientId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Appointme__Patie__6B24EA82");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.Receptionist).WithMany(p => p.Appointments)
                 .HasForeignKey(d => d.ReceptionistId)
@@ -113,9 +113,7 @@ public partial class MediCareDbContext : DbContext
                 .HasForeignKey(d => d.DoctorId)
                 .HasConstraintName("FK__Consultat__Docto__72C60C4A");
 
-            entity.HasOne(d => d.Patient).WithMany(p => p.ConsultationBills)
-                .HasForeignKey(d => d.PatientId)
-                .HasConstraintName("FK__Consultat__Patie__71D1E811");
+            entity.HasOne(d => d.Patient).WithMany(p => p.ConsultationBills).HasForeignKey(d => d.PatientId);
 
             entity.HasOne(d => d.Receptionist).WithMany(p => p.ConsultationBills)
                 .HasForeignKey(d => d.ReceptionistId)
@@ -170,6 +168,38 @@ public partial class MediCareDbContext : DbContext
                 .HasForeignKey(d => d.DoctorId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__DoctorSch__Docto__778AC167");
+        });
+
+        modelBuilder.Entity<LabBill>(entity =>
+        {
+            entity.HasKey(e => e.LabBillId).HasName("PK__LabBills__6E79ACD15C1FAA5E");
+
+            entity.HasIndex(e => e.LabBillNumber, "UQ__LabBills__F4E2415D41F3D83B").IsUnique();
+
+            entity.Property(e => e.IsPaid).HasDefaultValueSql("((0))");
+            entity.Property(e => e.IssuedDate)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.LabBillNumber).HasMaxLength(50);
+            entity.Property(e => e.TotalAmount).HasColumnType("decimal(10, 2)");
+
+            entity.HasOne(d => d.Doctor).WithMany(p => p.LabBills)
+                .HasForeignKey(d => d.DoctorId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__LabBills__Doctor__40F9A68C");
+
+            entity.HasOne(d => d.LabTechnician).WithMany(p => p.LabBills)
+                .HasForeignKey(d => d.LabTechnicianId)
+                .HasConstraintName("FK__LabBills__LabTec__41EDCAC5");
+
+            entity.HasOne(d => d.Patient).WithMany(p => p.LabBills)
+                .HasForeignKey(d => d.PatientId)
+                .OnDelete(DeleteBehavior.ClientSetNull);
+
+            entity.HasOne(d => d.Prescription).WithMany(p => p.LabBills)
+                .HasForeignKey(d => d.PrescriptionId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__LabBills__Prescr__40058253");
         });
 
         modelBuilder.Entity<LabInventory>(entity =>
@@ -236,24 +266,18 @@ public partial class MediCareDbContext : DbContext
 
         modelBuilder.Entity<Patient>(entity =>
         {
-            entity.HasKey(e => e.PatientId).HasName("PK__Patients__970EC366A0C262BB");
+            entity.HasKey(e => e.PatientId).HasName("PK__Patients__970EC3660E46192E");
 
-            entity.HasIndex(e => e.RegisterNumber, "UQ__Patients__86F493316C0A52EC").IsUnique();
-
-            entity.Property(e => e.PatientId).ValueGeneratedNever();
-            entity.Property(e => e.Address).HasMaxLength(200);
-            entity.Property(e => e.BloodGroup).HasMaxLength(50);
-            entity.Property(e => e.Contact).HasMaxLength(15);
-            entity.Property(e => e.CreatedBy).HasMaxLength(50);
-            entity.Property(e => e.CreatedDate)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
-            entity.Property(e => e.Dob).HasColumnType("datetime");
-            entity.Property(e => e.EmergencyNumber).HasMaxLength(15);
+            entity.Property(e => e.Address).HasMaxLength(255);
+            entity.Property(e => e.BloodGroup).HasMaxLength(10);
+            entity.Property(e => e.Contact).HasMaxLength(20);
+            entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+            entity.Property(e => e.Dob).HasColumnType("date");
+            entity.Property(e => e.EmergencyNumber).HasMaxLength(20);
             entity.Property(e => e.FirstName).HasMaxLength(100);
             entity.Property(e => e.Gender).HasMaxLength(10);
             entity.Property(e => e.LastName).HasMaxLength(100);
-            entity.Property(e => e.RegisterNumber).HasMaxLength(10);
+            entity.Property(e => e.RegisterNumber).HasMaxLength(50);
         });
 
         modelBuilder.Entity<PatientHistory>(entity =>
@@ -269,9 +293,7 @@ public partial class MediCareDbContext : DbContext
                 .HasForeignKey(d => d.AppointmentId)
                 .HasConstraintName("FK__PatientHi__Appoi__114A936A");
 
-            entity.HasOne(d => d.Patient).WithMany(p => p.PatientHistories)
-                .HasForeignKey(d => d.PatientId)
-                .HasConstraintName("FK__PatientHi__Patie__10566F31");
+            entity.HasOne(d => d.Patient).WithMany(p => p.PatientHistories).HasForeignKey(d => d.PatientId);
 
             entity.HasOne(d => d.PlabTest).WithMany(p => p.PatientHistories)
                 .HasForeignKey(d => d.PlabTestId)
@@ -364,6 +386,7 @@ public partial class MediCareDbContext : DbContext
             entity.Property(e => e.PmedicineId).HasColumnName("PMedicineId");
             entity.Property(e => e.Dosage).HasMaxLength(100);
             entity.Property(e => e.Duration).HasMaxLength(100);
+            entity.Property(e => e.IsIssued).HasDefaultValueSql("((0))");
 
             entity.HasOne(d => d.Medicine).WithMany(p => p.PrescribedMedicines)
                 .HasForeignKey(d => d.MedicineId)

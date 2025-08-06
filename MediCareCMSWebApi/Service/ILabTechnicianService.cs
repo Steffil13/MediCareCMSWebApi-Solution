@@ -31,5 +31,12 @@ namespace MediCareCMSWebApi.Service
         Task<List<TestResultViewModel>> GetAllTestResultsAsync();
 
         #endregion
+
+        #region lab bill
+
+        Task GenerateLabBillAsync(LabBillViewModel billModel);
+
+        #endregion
+
     }
 }

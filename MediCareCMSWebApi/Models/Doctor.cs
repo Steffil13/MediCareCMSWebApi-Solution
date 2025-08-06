@@ -45,5 +45,7 @@ public partial class Doctor
 
     public virtual ICollection<DoctorSchedule> DoctorSchedules { get; set; } = new List<DoctorSchedule>();
 
+    public virtual ICollection<LabBill> LabBills { get; set; } = new List<LabBill>();
+
     public virtual Role? Role { get; set; }
 }

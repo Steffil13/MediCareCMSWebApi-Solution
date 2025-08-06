@@ -1,4 +1,5 @@
-﻿using MediCareCMSWebApi.ViewModel;
+﻿using MediCareCMSWebApi.Models;
+using MediCareCMSWebApi.ViewModel;
 
 namespace MediCareCMSWebApi.Repository
 {
@@ -9,6 +10,9 @@ namespace MediCareCMSWebApi.Repository
         bool UpdateUser(int id, UserInputModel user);
         bool DeactivateUser(int id);
         UserInputModel? GetUserById(int id);
+
+        List<Department> GetAllDepartments();
+        int AddDepartment(string? departmentName, decimal? doctorFee);
 
     }
 

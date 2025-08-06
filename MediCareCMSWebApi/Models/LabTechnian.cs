@@ -33,5 +33,7 @@ public partial class LabTechnian
 
     public bool? IsActive { get; set; }
 
+    public virtual ICollection<LabBill> LabBills { get; set; } = new List<LabBill>();
+
     public virtual Role? Role { get; set; }
 }

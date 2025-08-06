@@ -29,7 +29,7 @@ namespace MediCareCMSWebApi.Repository
         #endregion
 
         #region Generate Lab Bill
-        Task GenerateLabBillAsync(LabBill labBill);
+        Task GenerateLabBillAsync(LabBill bill);
         #endregion
     }
 }
