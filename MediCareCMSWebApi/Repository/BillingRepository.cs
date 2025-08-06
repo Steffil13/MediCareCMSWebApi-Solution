@@ -7,29 +7,65 @@ namespace MediCareCMSWebApi.Repository
     public class BillingRepository : IBillingRepository
     {
         private readonly MediCareDbContext _context;
-        private readonly DbSet<BillingDto> _dbSet;
+
         public BillingRepository(MediCareDbContext context)
         {
             _context = context;
-            _dbSet = _context.Set<BillingDto>();
         }
 
         public async Task<IList<BillingDto>> GetAllAsync()
         {
-            return await _dbSet.ToListAsync();
+            return await _context.ConsultationBills
+                .Select(b => new BillingDto
+                {
+                    BillId = b.BillId,
+                    BillNumber = b.BillNumber,
+                    DateTime = b.DateTime,
+                    CreatedDate = b.CreatedDate,
+                    PatientId = b.PatientId,
+                    DoctorId = b.DoctorId,
+                    ReceptionistId = b.ReceptionistId,
+                    AppointmentId = b.AppointmentId
+                })
+                .ToListAsync();
         }
 
         public async Task<BillingDto?> GetByIdAsync(int id)
         {
-            return await _dbSet.FindAsync(id);
+            return await _context.ConsultationBills
+                .Where(b => b.BillId == id)
+                .Select(b => new BillingDto
+                {
+                    BillId = b.BillId,
+                    BillNumber = b.BillNumber,
+                    DateTime = b.DateTime,
+                    CreatedDate = b.CreatedDate,
+                    PatientId = b.PatientId,
+                    DoctorId = b.DoctorId,
+                    ReceptionistId = b.ReceptionistId,
+                    AppointmentId = b.AppointmentId
+                })
+                .FirstOrDefaultAsync();
         }
 
-        public async Task AddAsync(BillingDto billing)
+        public async Task AddAsync(BillingDto billingDto)
         {
-            await _dbSet.AddAsync(billing);
+            var bill = new ConsultationBill
+            {
+                BillNumber = billingDto.BillNumber,
+                DateTime = billingDto.DateTime,
+                CreatedDate = billingDto.CreatedDate ?? DateTime.Now,
+                PatientId = billingDto.PatientId,
+                DoctorId = billingDto.DoctorId,
+                ReceptionistId = billingDto.ReceptionistId,
+                AppointmentId = billingDto.AppointmentId
+            };
 
+            await _context.ConsultationBills.AddAsync(bill);
+            await _context.SaveChangesAsync();
 
+            // Optional: set generated ID back to DTO
+            billingDto.BillId = bill.BillId;
         }
-
     }
 }

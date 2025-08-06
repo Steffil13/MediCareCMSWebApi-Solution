@@ -1,8 +1,12 @@
-﻿namespace MediCareCMSWebApi.ViewModel
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace MediCareCMSWebApi.ViewModel
 {
     public class AppointmentDto
     {
-        public int AppointmentId { get; set; }
+        
+        public int? AppointmentId { get; set; }
         public int PatientId { get; set; }
         public int DoctorId { get; set; }
         public string? AppointmentNumber { get; set; }
@@ -13,6 +17,7 @@
         public bool? IsConsulted { get; set; }
         public DateTime? CreatedDate { get; set; }
         public int ReceptionistId { get; set; }
+        public string? Notes { get; set; }
     }
 
 }

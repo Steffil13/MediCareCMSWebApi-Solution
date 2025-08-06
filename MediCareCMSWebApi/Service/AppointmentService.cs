@@ -13,12 +13,12 @@ namespace MediCareCMSWebApi.Service
             _repository = repository;
         }
 
-        public Task<IEnumerable<Appointment>> GetAppointmentsByPatientIdAsync(int patientId)
+        public Task<IEnumerable<AppointmentDto>> GetAppointmentsByPatientIdAsync(int patientId)
         {
             return _repository.GetAppointmentsByPatientIdAsync(patientId);
         }
 
-        public Task<Appointment> GetAppointmentByIdAsync(string appointmentId)
+        public Task<Appointment> GetAppointmentByIdAsync(int appointmentId)
         {
             return _repository.GetAppointmentByIdAsync(appointmentId);
         }
@@ -28,12 +28,12 @@ namespace MediCareCMSWebApi.Service
             return _repository.ScheduleAppointmentAsync(appointment);
         }
 
-        public Task<bool> UpdateAppointmentAsync(Appointment appointment)
+        public Task<bool> UpdateAppointmentAsync(int AppointmentId,Appointment appointment)
         {
-            return _repository.UpdateAppointmentAsync(appointment);
+            return _repository.UpdateAppointmentAsync(AppointmentId, appointment);
         }
 
-        public Task<bool> DeleteAppointmentAsync(string appointmentId)
+        public Task<bool> DeleteAppointmentAsync(int appointmentId)
         {
             return _repository.DeleteAppointmentAsync(appointmentId);
         }
@@ -41,6 +41,10 @@ namespace MediCareCMSWebApi.Service
         public async Task<List<AppointmentDto>> GetAppointmentsForDoctorAsync(int doctorId)
         {
             return await _repository.GetAppointmentsForDoctorAsync(doctorId);
+        }
+        public async Task<int> ScheduleAppointmentAsync(AppointmentViewModel dto)
+        {
+            return await _repository.AddAsync(dto);
         }
     }
 }
