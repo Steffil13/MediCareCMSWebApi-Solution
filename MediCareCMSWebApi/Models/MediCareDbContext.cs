@@ -69,7 +69,7 @@ public partial class MediCareDbContext : DbContext
         {
             entity.HasKey(e => e.AppointmentId).HasName("PK__Appointm__8ECDFCC243338EF7");
 
-            entity.Property(e => e.AppointmentId).ValueGeneratedNever();
+            entity.Property(e => e.AppointmentId).UseIdentityColumn();
             entity.Property(e => e.AppointmentDate).HasColumnType("date");
             entity.Property(e => e.AppointmentNumber).HasMaxLength(50);
             entity.Property(e => e.AppointmentTime).HasMaxLength(20);
@@ -81,7 +81,7 @@ public partial class MediCareDbContext : DbContext
             entity.HasOne(d => d.Doctor).WithMany(p => p.Appointments)
                 .HasForeignKey(d => d.DoctorId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Appointme__Docto__6C190EBB");
+                .HasConstraintName("FK__Appointme__Docto__51300E55");
 
             entity.HasOne(d => d.Patient).WithMany(p => p.Appointments)
                 .HasForeignKey(d => d.PatientId)
@@ -90,7 +90,7 @@ public partial class MediCareDbContext : DbContext
             entity.HasOne(d => d.Receptionist).WithMany(p => p.Appointments)
                 .HasForeignKey(d => d.ReceptionistId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Appointme__Recep__6D0D32F4");
+                .HasConstraintName("FK__Appointme__Recep__5224328E");
         });
 
         modelBuilder.Entity<ConsultationBill>(entity =>

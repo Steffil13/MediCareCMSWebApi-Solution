@@ -1,4 +1,5 @@
-﻿using MediCareCMSWebApi.Service;
+﻿using MediCareCMSWebApi.Models;
+using MediCareCMSWebApi.Service;
 using MediCareCMSWebApi.ViewModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -10,16 +11,16 @@ namespace MediCareCMSWebApi.Controllers
     public class ReceptionistController : ControllerBase
     {
         private readonly IPatientService _patientService;
-        //private readonly IAppointmentService _appointmentService;
+        private readonly IAppointmentService _appointmentService;
         private readonly IBillingService _billingService;
 
         public ReceptionistController(
             IPatientService patientService,
-            //IAppointmentService appointmentService,
+            IAppointmentService appointmentService,
             IBillingService billingService)
         {
             _patientService = patientService;
-            //_appointmentService = appointmentService;
+            _appointmentService = appointmentService;
             _billingService = billingService;
         }
 
@@ -52,50 +53,90 @@ namespace MediCareCMSWebApi.Controllers
 
         // Appointment Scheduling
 
-        //[HttpPost("appointments")]
-        //public async Task<ActionResult> ScheduleAppointment([FromBody] AppointmentDto appointment)
-        //{
-        //    var appointmentId = await _appointmentService.ScheduleAppointmentAsync(appointment);
-        //    return CreatedAtAction(nameof(GetAppointmentById), new { id = appointmentId }, new { AppointmentId = appointmentId });
-        //}
+        // GET: api/Receptionist/patient/{patientId}/appointments
+        [HttpGet("patient/{patientId}/appointments")]
+        public async Task<IActionResult> GetAppointmentsByPatient(int patientId)
+        {
+            var appointments = await _appointmentService.GetAppointmentsByPatientIdAsync(patientId);
 
-        //[HttpPut("appointments/{id}")]
-        //public async Task<IActionResult> UpdateAppointment(int id, [FromBody] AppointmentDto appointment)
-        //{
-        //    var updated = await _appointmentService.UpdateAppointmentAsync(id, appointment);
-        //    if (!updated)
-        //        return NotFound();
-        //    return NoContent();
-        //}
+            if (appointments == null || !appointments.Any())
+                return NotFound($"No appointments found for patient with ID {patientId}.");
 
-        //[HttpDelete("appointments/{id}")]
-        //public async Task<IActionResult> CancelAppointment(int id)
-        //{
-        //    var canceled = await _appointmentService.CancelAppointmentAsync(id);
-        //    if (!canceled)
-        //        return NotFound();
-        //    return NoContent();
-        //}
+            return Ok(appointments);
+        }
 
-        //[HttpGet("appointments/{id}")]
-        //public async Task<ActionResult<AppointmentDto>> GetAppointmentById(int id)
-        //{
-        //    var appointment = await _appointmentService.GetAppointmentByIdAsync(id);
-        //    if (appointment == null)
-        //        return NotFound();
-        //    return Ok(appointment);
-        //}
+        // GET: api/Receptionist/appointments/doctor/{doctorId}
+        [HttpGet("appointments/doctor/{doctorId}")]
+        public async Task<IActionResult> GetAppointmentsForDoctor(int doctorId)
+        {
+            var appointments = await _appointmentService.GetAppointmentsForDoctorAsync(doctorId);
+            return Ok(appointments);
+        }
 
-        //[HttpGet("appointments")]
-        //public async Task<ActionResult<List<AppointmentDto>>> ListAppointments(
-        //    [FromQuery] DateTime? startDate,
-        //    [FromQuery] DateTime? endDate,
-        //    [FromQuery] int? doctorId,
-        //    [FromQuery] int? patientId)
-        //{
-        //    var appointments = await _appointmentService.ListAppointmentsAsync(startDate, endDate, doctorId, patientId);
-        //    return Ok(appointments);
-        //}
+        // GET: api/Receptionist/appointments/{id}
+        [HttpGet("appointments/{id}")]
+        public async Task<IActionResult> GetAppointmentById(int id)
+        {
+            var appointment = await _appointmentService.GetAppointmentByIdAsync(id);
+            if (appointment == null)
+                return NotFound();
+
+            return Ok(appointment);
+        }
+
+        // POST: api/Receptionist/appointments
+        // Schedule a new appointment with token generation handled internally
+        [HttpPost("appointments")]
+        public async Task<IActionResult> ScheduleAppointment([FromBody] AppointmentViewModel appointmentDto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                var appointmentId = await _appointmentService.ScheduleAppointmentAsync(appointmentDto);
+                var appointment = await _appointmentService.GetAppointmentByIdAsync(appointmentId);
+
+                return CreatedAtAction(nameof(GetAppointmentById), new { id = appointmentId }, appointment);
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Handle token limit or other business exceptions
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        // PUT: api/Receptionist/appointments/{id}
+        [HttpPut("appointments/{id}")]
+        public async Task<IActionResult> UpdateAppointment(int id, [FromBody] Appointment appointment)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var existingAppointment = await _appointmentService.GetAppointmentByIdAsync(id);
+            if (existingAppointment == null)
+                return NotFound();
+
+            appointment.AppointmentId = id; // if needed, set the ID
+
+            var updated = await _appointmentService.UpdateAppointmentAsync(id, appointment);
+            if (!updated)
+                return StatusCode(500, "Failed to update appointment");
+
+            var updatedAppointment = await _appointmentService.GetAppointmentByIdAsync(id);
+            return Ok(updatedAppointment);
+        }
+
+        // DELETE: api/Receptionist/appointments/{id}
+        [HttpDelete("appointments/{id}")]
+        public async Task<IActionResult> DeleteAppointment(int id)
+        {
+            var deleted = await _appointmentService.DeleteAppointmentAsync(id);
+            if (!deleted)
+                return NotFound();
+
+            return NoContent();
+        }
 
         // Consultation Billing
 

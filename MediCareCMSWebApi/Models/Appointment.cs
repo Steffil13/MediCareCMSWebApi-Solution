@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MediCareCMSWebApi.Models;
 
 public partial class Appointment
 {
+    
     public int AppointmentId { get; set; }
 
     public string? AppointmentNumber { get; set; }
