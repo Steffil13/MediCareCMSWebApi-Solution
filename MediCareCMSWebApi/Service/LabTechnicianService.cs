@@ -33,7 +33,7 @@ namespace MediCareCMSWebApi.Service
         #endregion
 
         #region View All Lab Tests
-        public async Task<IEnumerable<LabInventory>> GetAllLabTestsAsync()
+        public async Task<IEnumerable<LabInventory>> GetAllLabTestsAsync(ViewAllLabTestsViewModel model)
         {
             return await _context.LabInventories.ToListAsync();
         }
@@ -131,7 +131,36 @@ namespace MediCareCMSWebApi.Service
             await _context.LabBills.AddAsync(bill);
             await _context.SaveChangesAsync();
         }
-#endregion
+        #endregion
+        public async Task<IEnumerable<AssignedLabTestViewModel>> GetAllAssignedLabTestsAsync()
+        {
+            return await _context.PrescribedLabTests
+                .Include(p => p.Lab)
+                .Include(p => p.Prescription)
+                    .ThenInclude(pr => pr.Appointment)
+                        .ThenInclude(ap => ap.Doctor)
+                .Include(p => p.Prescription)
+                    .ThenInclude(pr => pr.Appointment)
+                        .ThenInclude(ap => ap.Patient)
+                .Select(p => new AssignedLabTestViewModel
+                {
+                    PlabTestId = p.PlabTestId,
+                    LabId = p.LabId,
+                    LabName = p.Lab.LabName,
+                    Price = p.Lab.Price ?? 0,
+                    NormalRange = p.Lab.NormalRange ?? string.Empty,
+                    PrescriptionId = p.PrescriptionId,
+                    DoctorId = p.Prescription.Appointment.DoctorId,
+                    PatientId = p.Prescription.Appointment.PatientId,
+                    DoctorName = p.Prescription.Appointment.Doctor.FirstName + " " + p.Prescription.Appointment.Doctor.LastName,
+                    PatientName = p.Prescription.Appointment.Patient.FirstName + " " + p.Prescription.Appointment.Patient.LastName,
+                    Date = p.Prescription.CreatedDate ?? DateTime.MinValue,
+                    IsCompleted = p.IsCompleted ?? false
+                })
+                .ToListAsync();
+        }
+
+
 
 
 

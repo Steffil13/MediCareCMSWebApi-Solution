@@ -9,7 +9,7 @@ namespace MediCareCMSWebApi.Service
         #region Lab Inventory
 
         Task<int> AddLabTestAsync(LabTechnicianViewModels.AddLabTestViewModel model);
-        Task<IEnumerable<LabInventory>> GetAllLabTestsAsync();
+        Task<IEnumerable<LabInventory>> GetAllLabTestsAsync(ViewAllLabTestsViewModel model);
         Task<LabInventory?> GetLabTestByIdAsync(int id);
 
         #endregion
@@ -25,6 +25,9 @@ namespace MediCareCMSWebApi.Service
         Task<IEnumerable<PatientHistory>> GetPatientLabHistoryAsync(int patientId);
 
         #endregion
+
+        Task<IEnumerable<AssignedLabTestViewModel>> GetAllAssignedLabTestsAsync();
+
 
         #region Lab Records
 

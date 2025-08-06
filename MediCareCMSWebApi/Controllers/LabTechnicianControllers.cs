@@ -28,11 +28,12 @@ namespace MediCareCMSWebApi.Controllers
 
         #region View All Lab Tests
         [HttpGet("get-all-labtests")]
-        public async Task<IActionResult> GetAllLabTestsAsync()
+        public async Task<IActionResult> GetAllLabTestsAsync([FromQuery] ViewAllLabTestsViewModel model)
         {
-            var tests = await _labService.GetAllLabTestsAsync();
+            var tests = await _labService.GetAllLabTestsAsync(model);
             return Ok(tests);
         }
+
         #endregion
 
         #region Get Lab Test By ID
@@ -90,6 +91,29 @@ namespace MediCareCMSWebApi.Controllers
         }
 
         #endregion
+
+
+
+        // In your Controller
+        [HttpGet("assigned-lab-tests")]
+        public async Task<IActionResult> GetAllAssignedLabTests()
+        {
+            try
+            {
+                var labTests = await _labService.GetAllAssignedLabTestsAsync();
+
+                if (labTests == null || !labTests.Any())
+                    return NotFound("No lab tests found.");
+
+                return Ok(labTests);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+
     }
 }
 

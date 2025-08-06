@@ -39,6 +39,21 @@
         }
         #endregion
 
+        #region View All Lab Tests ViewModel
+        public class ViewAllLabTestsViewModel
+        {
+            public int PlabTestId { get; set; }
+            public int PrescriptionId { get; set; }
+            public int LabId { get; set; }
+            public string? LabName { get; set; }
+            public string? NormalRange { get; set; }
+            public decimal? Price { get; set; }
+            public bool? Availability { get; set; }
+            public bool? IsCompleted { get; set; }
+        }
+        #endregion
+
+
         public class TestResultViewModel
         {
             public int TestResultId { get; set; }
@@ -52,6 +67,28 @@
             // Optional: Include minimal Lab/Test details if needed
             public string? LabName { get; set; }
         }
+
+        public class AssignedLabTestViewModel
+        {
+            public int PlabTestId { get; set; }
+            public int PrescriptionId { get; set; }
+            public int LabId { get; set; }
+
+            public string LabName { get; set; } = string.Empty;
+            public decimal Price { get; set; }
+            public string NormalRange { get; set; } = string.Empty;
+
+            public int DoctorId { get; set; }
+            public string DoctorName { get; set; } = string.Empty;
+
+            public int PatientId { get; set; }
+            public string PatientName { get; set; } = string.Empty;
+
+            public DateTime Date { get; set; }
+            public bool IsCompleted { get; set; }
+        }
+
+
 
     }
 }

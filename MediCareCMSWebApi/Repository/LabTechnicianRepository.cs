@@ -1,5 +1,6 @@
 ﻿using MediCareCMSWebApi.Models;
 using Microsoft.EntityFrameworkCore;
+using static MediCareCMSWebApi.ViewModel.LabTechnicianViewModels;
 
 namespace MediCareCMSWebApi.Repository
 {
@@ -21,7 +22,7 @@ namespace MediCareCMSWebApi.Repository
         #endregion
 
         #region View All Lab Tests
-        public async Task<IEnumerable<LabInventory>> GetAllLabTestsAsync()
+        public async Task<IEnumerable<LabInventory>> GetAllLabTestsAsync(ViewAllLabTestsViewModel model)
         {
             return await _context.LabInventories.ToListAsync();
         }
@@ -74,6 +75,32 @@ namespace MediCareCMSWebApi.Repository
             await _context.SaveChangesAsync();
         }
         #endregion
+
+        // In LabTechnicianRepository.cs
+        public async Task<IEnumerable<AssignedLabTestViewModel>> GetAllAssignedLabTestsAsync()
+        {
+            return await _context.PrescribedLabTests
+                .Include(pl => pl.Lab)
+                .Include(pl => pl.Prescription)
+                    .ThenInclude(p => p.Appointment)
+                .Select(pl => new AssignedLabTestViewModel
+                {
+                    PlabTestId = pl.PlabTestId,
+                    PrescriptionId = pl.PrescriptionId,
+                    LabId = pl.LabId,
+                    LabName = pl.Lab.LabName,
+                    Price = (decimal)pl.Lab.Price,
+                    NormalRange = pl.Lab.NormalRange,
+                    DoctorId = pl.Prescription.Appointment.DoctorId,
+                    PatientId = pl.Prescription.Appointment.PatientId,
+                    Date = pl.Prescription.Appointment.AppointmentDate,
+                    IsCompleted = pl.IsCompleted ?? false
+                })
+                .ToListAsync();
+        }
+
+
+
     }
 }
 

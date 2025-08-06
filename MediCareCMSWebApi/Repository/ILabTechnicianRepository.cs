@@ -1,4 +1,5 @@
 ﻿using MediCareCMSWebApi.Models;
+using static MediCareCMSWebApi.ViewModel.LabTechnicianViewModels;
 
 namespace MediCareCMSWebApi.Repository
 {
@@ -9,7 +10,7 @@ namespace MediCareCMSWebApi.Repository
         #endregion
 
         #region View All Lab Tests
-        Task<IEnumerable<LabInventory>> GetAllLabTestsAsync();
+        Task<IEnumerable<LabInventory>> GetAllLabTestsAsync(ViewAllLabTestsViewModel model);
         #endregion
 
         #region Get Lab Test by ID
@@ -31,5 +32,11 @@ namespace MediCareCMSWebApi.Repository
         #region Generate Lab Bill
         Task GenerateLabBillAsync(LabBill bill);
         #endregion
+
+        #region View All Assigned Lab Tests (All Patients)
+        // In ILabTechnicianRepository.cs
+        Task<IEnumerable<AssignedLabTestViewModel>> GetAllAssignedLabTestsAsync();
+        #endregion
+
     }
 }
