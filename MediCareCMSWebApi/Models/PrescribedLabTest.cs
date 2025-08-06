@@ -20,4 +20,5 @@ public partial class PrescribedLabTest
     public virtual Prescription Prescription { get; set; } = null!;
 
     public virtual ICollection<TestResult> TestResults { get; set; } = new List<TestResult>();
+    public string? LabName { get; set; }
 }

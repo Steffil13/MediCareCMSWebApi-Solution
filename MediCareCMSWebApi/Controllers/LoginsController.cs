@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
 
 namespace MediCareCMSWebApi.Controllers
@@ -23,14 +24,14 @@ namespace MediCareCMSWebApi.Controllers
 
         [AllowAnonymous]
         [HttpGet("{username}/{password}")]
-        public IActionResult Login(string username, string password) 
+        public IActionResult Login(string username, string password)
         {
             IActionResult response = Unauthorized();
             User dbUser = null;
 
-            dbUser =_loginService.AuthenticateUser(username, password);
+            dbUser = _loginService.AuthenticateUser(username, password);
 
-            if(dbUser != null) 
+            if (dbUser != null)
             {
                 var tokenString = GenerateJWTToken(dbUser);
 
@@ -50,17 +51,24 @@ namespace MediCareCMSWebApi.Controllers
         private object GenerateJWTToken(User dbUser)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
-
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
+            var claims = new[]
+            {
+                new Claim(ClaimTypes.Name, dbUser.Username),
+                new Claim(ClaimTypes.Role, dbUser.RoleId.ToString()),
+                new Claim(ClaimTypes.Role, dbUser.RoleName)// Assuming RoleId is like "Admin", "Doctor", etc.
+            };
 
             var token = new JwtSecurityToken(
-                     issuer: _configuration["Jwt:Issuer"],
-                     audience: _configuration["Jwt:Issuer"],
-                     claims: null, // You can add claims here if needed
-                     expires: DateTime.Now.AddMinutes(30), // Token expiration time
-                     signingCredentials: credentials);
+                issuer: _configuration["Jwt:Issuer"],
+                audience: _configuration["Jwt:Issuer"],
+                claims: claims,
+                expires: DateTime.Now.AddMinutes(30),
+                signingCredentials: credentials);
+
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
     }
 }

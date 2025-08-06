@@ -5,7 +5,10 @@ namespace MediCareCMSWebApi.Models;
 
 public partial class Prescription
 {
+    
+
     public int PrescriptionId { get; set; }
+   // public int? DoctorId { get; set; }
 
     public int AppointmentId { get; set; }
 

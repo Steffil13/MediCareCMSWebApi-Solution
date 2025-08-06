@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using MediCareCMSWebApi.Service;
+using MediCareCMSWebApi.ViewModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+//using System.Security.Claims;
 
 namespace MediCareCMSWebApi.Controllers
 {
@@ -22,8 +25,15 @@ namespace MediCareCMSWebApi.Controllers
         [HttpGet("appointments")]
         public async Task<IActionResult> GetDoctorAppointments()
         {
-            var doctorId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
-            var appointments = await _appointmentService.GetAppointmentsForDoctorAsync(doctorId);
+            var roleClaim = User.FindFirst(ClaimTypes.Role)?.Value;
+            if (!int.TryParse(roleClaim, out int roleId))
+                return Unauthorized("Invalid role in token.");
+
+            int? doctorId = await _doctorService.GetDoctorIdByRoleIdAsync(roleId);
+            if (doctorId == null)
+                return NotFound("Doctor not found for this role.");
+
+            var appointments = await _appointmentService.GetAppointmentsForDoctorAsync(doctorId.Value);
             return Ok(appointments);
         }
 
@@ -32,10 +42,12 @@ namespace MediCareCMSWebApi.Controllers
         public async Task<IActionResult> AddPrescription([FromBody] CreatePrescriptionDto dto)
         {
             var result = await _doctorService.CreatePrescriptionAsync(dto);
-            return result
-                ? Ok(new { message = "Prescription created successfully" })
-                : BadRequest(new { message = "Failed to create prescription" });
+            if (result == null)
+                return BadRequest(new { message = "Failed to create prescription" });
+
+            return Ok(new { message = "Prescription created successfully", data = result });
         }
+
 
         // 🔹 3. Add Prescribed Medicine
         [HttpPost("add-medicine")]
@@ -51,7 +63,7 @@ namespace MediCareCMSWebApi.Controllers
         [HttpPost("add-labtest")]
         public async Task<IActionResult> AddPrescribedLabTest([FromBody] PrescribedLabTestDto dto)
         {
-            var result = await _doctorService.AddPrescribedLabTestAsync(dto);
+            var result = await _doctorService.AddLabTestRequestAsync(dto);
             return result
                 ? Ok(new { message = "Lab test added to prescription" })
                 : BadRequest(new { message = "Failed to add lab test" });
@@ -59,11 +71,12 @@ namespace MediCareCMSWebApi.Controllers
 
         // 🔹 5. View Prescription for Appointment
         [HttpGet("prescription/{appointmentId}")]
-        public async Task<IActionResult> GetPrescriptionByAppointmentId(int appointmentId)
+        public async Task<IActionResult> GetPrescriptionByAppointmentId(string appointmentNumber)
         {
-            var prescription = await _doctorService.GetPrescriptionByAppointmentIdAsync(appointmentId);
+            var prescription = await _doctorService.GetPrescriptionByAppointmentNumberAsync(appointmentNumber);
             return prescription != null
                 ? Ok(prescription)
                 : NotFound(new { message = "No prescription found for this appointment" });
         }
     }
+}
