@@ -73,20 +73,18 @@
             public int PlabTestId { get; set; }
             public int PrescriptionId { get; set; }
             public int LabId { get; set; }
-
-            public string LabName { get; set; } = string.Empty;
+            public string LabName { get; set; }
             public decimal Price { get; set; }
-            public string NormalRange { get; set; } = string.Empty;
-
+            public string NormalRange { get; set; }
             public int DoctorId { get; set; }
-            public string DoctorName { get; set; } = string.Empty;
-
+            public string DoctorName { get; set; }         // <-- Add this
             public int PatientId { get; set; }
-            public string PatientName { get; set; } = string.Empty;
-
+            public string PatientName { get; set; }        // <-- Add this
             public DateTime Date { get; set; }
             public bool IsCompleted { get; set; }
         }
+
+
 
 
 

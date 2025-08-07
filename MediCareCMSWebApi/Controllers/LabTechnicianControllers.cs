@@ -7,7 +7,7 @@ using static MediCareCMSWebApi.ViewModel.LabTechnicianViewModels;
 
 namespace MediCareCMSWebApi.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/LabTechnician")]
     [ApiController]
     public class LabTechnicianControllers : ControllerBase
     {
@@ -95,25 +95,13 @@ namespace MediCareCMSWebApi.Controllers
 
 
         // In your Controller
-        [HttpGet("assigned-lab-tests")]
-        public async Task<IActionResult> GetAllAssignedLabTests()
+        [HttpGet("alllabtests")]
+        [HttpGet("get-prescribed-labtests")]
+        public async Task<IActionResult> GetAllPrescribedLabTestsAsync()
         {
-            try
-            {
-                var labTests = await _labService.GetAllAssignedLabTestsAsync();
-
-                if (labTests == null || !labTests.Any())
-                    return NotFound("No lab tests found.");
-
-                return Ok(labTests);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
+            var result = await _labService.GetAllPrescribedLabTestsAsync();
+            return Ok(result);
         }
-
-
     }
 }
 

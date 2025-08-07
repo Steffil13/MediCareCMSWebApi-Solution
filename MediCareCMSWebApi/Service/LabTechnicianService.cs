@@ -132,38 +132,33 @@ namespace MediCareCMSWebApi.Service
             await _context.SaveChangesAsync();
         }
         #endregion
-        public async Task<IEnumerable<AssignedLabTestViewModel>> GetAllAssignedLabTestsAsync()
+        public async Task<IEnumerable<AssignedLabTestViewModel>> GetAllPrescribedLabTestsAsync()
         {
             return await _context.PrescribedLabTests
-                .Include(p => p.Lab)
-                .Include(p => p.Prescription)
-                    .ThenInclude(pr => pr.Appointment)
-                        .ThenInclude(ap => ap.Doctor)
-                .Include(p => p.Prescription)
-                    .ThenInclude(pr => pr.Appointment)
-                        .ThenInclude(ap => ap.Patient)
-                .Select(p => new AssignedLabTestViewModel
+                .Include(pl => pl.Lab)
+                .Include(pl => pl.Prescription)
+                    .ThenInclude(p => p.Appointment)
+                        .ThenInclude(a => a.Doctor)   // Include Doctor
+                .Include(pl => pl.Prescription)
+                    .ThenInclude(p => p.Appointment)
+                        .ThenInclude(a => a.Patient)  // Include Patient
+                .Select(pl => new AssignedLabTestViewModel
                 {
-                    PlabTestId = p.PlabTestId,
-                    LabId = p.LabId,
-                    LabName = p.Lab.LabName,
-                    Price = p.Lab.Price ?? 0,
-                    NormalRange = p.Lab.NormalRange ?? string.Empty,
-                    PrescriptionId = p.PrescriptionId,
-                    DoctorId = p.Prescription.Appointment.DoctorId,
-                    PatientId = p.Prescription.Appointment.PatientId,
-                    DoctorName = p.Prescription.Appointment.Doctor.FirstName + " " + p.Prescription.Appointment.Doctor.LastName,
-                    PatientName = p.Prescription.Appointment.Patient.FirstName + " " + p.Prescription.Appointment.Patient.LastName,
-                    Date = p.Prescription.CreatedDate ?? DateTime.MinValue,
-                    IsCompleted = p.IsCompleted ?? false
+                    PlabTestId = pl.PlabTestId,
+                    PrescriptionId = pl.PrescriptionId,
+                    LabId = pl.LabId,
+                    LabName = pl.Lab.LabName,
+                    Price = (decimal)pl.Lab.Price,
+                    NormalRange = pl.Lab.NormalRange,
+                    DoctorId = pl.Prescription.Appointment.DoctorId,
+                    DoctorName = pl.Prescription.Appointment.Doctor.FirstName + " " + pl.Prescription.Appointment.Doctor.LastName,
+                    PatientId = pl.Prescription.Appointment.PatientId,
+                    PatientName = pl.Prescription.Appointment.Patient.FirstName + " " + pl.Prescription.Appointment.Patient.LastName,
+                    Date = pl.Prescription.Appointment.AppointmentDate,
+                    IsCompleted = pl.IsCompleted ?? false
                 })
                 .ToListAsync();
         }
-
-
-
-
-
 
     }
 }

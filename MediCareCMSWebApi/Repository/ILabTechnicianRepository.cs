@@ -25,17 +25,13 @@ namespace MediCareCMSWebApi.Repository
         Task<IEnumerable<PatientHistory>> GetPatientLabHistoryAsync(int patientId);
         #endregion
 
-        #region View All Prescribed Lab Tests
-        Task<IEnumerable<PrescribedLabTest>> GetAllPrescribedLabTestsAsync();
-        #endregion
-
         #region Generate Lab Bill
         Task GenerateLabBillAsync(LabBill bill);
         #endregion
 
         #region View All Assigned Lab Tests (All Patients)
         // In ILabTechnicianRepository.cs
-        Task<IEnumerable<AssignedLabTestViewModel>> GetAllAssignedLabTestsAsync();
+        Task<IEnumerable<AssignedLabTestViewModel>> GetAllPrescribedLabTestsAsync();
         #endregion
 
     }

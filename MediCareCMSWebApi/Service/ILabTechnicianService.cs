@@ -26,7 +26,7 @@ namespace MediCareCMSWebApi.Service
 
         #endregion
 
-        Task<IEnumerable<AssignedLabTestViewModel>> GetAllAssignedLabTestsAsync();
+        Task<IEnumerable<AssignedLabTestViewModel>> GetAllPrescribedLabTestsAsync();
 
 
         #region Lab Records

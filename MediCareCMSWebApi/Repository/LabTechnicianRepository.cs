@@ -57,17 +57,7 @@ namespace MediCareCMSWebApi.Repository
         }
         #endregion
 
-        #region View All Prescribed Lab Tests
-        public async Task<IEnumerable<PrescribedLabTest>> GetAllPrescribedLabTestsAsync()
-        {
-            return await _context.PrescribedLabTests
-                .Include(p => p.Lab)
-                .Include(p => p.Prescription)
-                .ThenInclude(p => p.Appointment)
-                .ToListAsync();
-        }
-        #endregion
-
+ 
         #region Generate Lab Bill
         public async Task GenerateLabBillAsync(LabBill labBill)
         {
@@ -77,7 +67,7 @@ namespace MediCareCMSWebApi.Repository
         #endregion
 
         // In LabTechnicianRepository.cs
-        public async Task<IEnumerable<AssignedLabTestViewModel>> GetAllAssignedLabTestsAsync()
+        public async Task<IEnumerable<AssignedLabTestViewModel>> GetAllPrescribedLabTestsAsync()
         {
             return await _context.PrescribedLabTests
                 .Include(pl => pl.Lab)
@@ -93,14 +83,13 @@ namespace MediCareCMSWebApi.Repository
                     NormalRange = pl.Lab.NormalRange,
                     DoctorId = pl.Prescription.Appointment.DoctorId,
                     PatientId = pl.Prescription.Appointment.PatientId,
+                    DoctorName = pl.Prescription.Appointment.Doctor.FirstName + " " + pl.Prescription.Appointment.Doctor.LastName,
+                    PatientName = pl.Prescription.Appointment.Patient.FirstName + " " + pl.Prescription.Appointment.Patient.LastName,
                     Date = pl.Prescription.Appointment.AppointmentDate,
                     IsCompleted = pl.IsCompleted ?? false
                 })
                 .ToListAsync();
         }
-
-
-
     }
 }
 
