@@ -68,6 +68,14 @@
             public string? LabName { get; set; }
         }
 
+        public class UpdateTestResultViewModel
+        {
+            public string? ResultValue { get; set; }
+            public bool? ResultStatus { get; set; }
+            public string? Remarks { get; set; }
+        }
+
+
         public class AssignedLabTestViewModel
         {
             public int PlabTestId { get; set; }

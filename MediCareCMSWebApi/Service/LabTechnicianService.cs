@@ -160,5 +160,22 @@ namespace MediCareCMSWebApi.Service
                 .ToListAsync();
         }
 
+        public async Task<bool> UpdateTestResultAsync(int id, UpdateTestResultViewModel model)
+        {
+            var testResult = await _context.TestResults.FindAsync(id);
+            if (testResult == null)
+                return false;
+
+            testResult.ResultValue = model.ResultValue;
+            testResult.ResultStatus = model.ResultStatus;
+            testResult.Remarks = model.Remarks;
+            testResult.RecordDate = DateTime.Now;
+
+            _context.TestResults.Update(testResult);
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
     }
 }

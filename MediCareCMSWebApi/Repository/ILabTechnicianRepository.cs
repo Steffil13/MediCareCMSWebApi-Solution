@@ -34,5 +34,8 @@ namespace MediCareCMSWebApi.Repository
         Task<IEnumerable<AssignedLabTestViewModel>> GetAllPrescribedLabTestsAsync();
         #endregion
 
+        Task<bool> UpdateTestResultAsync(int id, UpdateTestResultViewModel model);
+
+
     }
 }

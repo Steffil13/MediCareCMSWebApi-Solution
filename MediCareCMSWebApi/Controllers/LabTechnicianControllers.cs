@@ -92,10 +92,17 @@ namespace MediCareCMSWebApi.Controllers
 
         #endregion
 
+        [HttpPut("update-test-result/{id}")]
+        public async Task<IActionResult> UpdateTestResultAsync(int id, [FromBody] UpdateTestResultViewModel model)
+        {
+            var updated = await _labService.UpdateTestResultAsync(id, model);
+            if (!updated)
+                return NotFound(new { Message = $"Test result with ID {id} not found." });
+
+            return Ok(new { Message = "Test result updated successfully." });
+        }
 
 
-        // In your Controller
-        [HttpGet("alllabtests")]
         [HttpGet("get-prescribed-labtests")]
         public async Task<IActionResult> GetAllPrescribedLabTestsAsync()
         {

@@ -12,7 +12,11 @@ namespace MediCareCMSWebApi.Service
         Task<IEnumerable<LabInventory>> GetAllLabTestsAsync(ViewAllLabTestsViewModel model);
         Task<LabInventory?> GetLabTestByIdAsync(int id);
 
+
+
         #endregion
+        Task<bool> UpdateTestResultAsync(int id, UpdateTestResultViewModel model);
+
 
         #region Prescribed Lab Tests
 
