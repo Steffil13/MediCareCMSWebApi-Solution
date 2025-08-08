@@ -27,26 +27,40 @@ namespace MediCareCMSWebApi.Controllers
         public IActionResult Login(string username, string password)
         {
             IActionResult response = Unauthorized();
-            User dbUser = null;
-
-            dbUser = _loginService.AuthenticateUser(username, password);
+            User dbUser = _loginService.AuthenticateUser(username, password);
 
             if (dbUser != null)
             {
+                // Default null in case not a doctor
+                int? doctorId = null;
+
+                // If this user is a doctor, fetch doctorId
+                if (dbUser.RoleName.Equals("Doctor", StringComparison.OrdinalIgnoreCase))
+                {
+                    // Example: if you have a Doctors table linked by Username
+                    using (var context = new MediCareDbContext())
+                    {
+                        doctorId = context.Doctors
+                            .Where(d => d.Username == dbUser.Username) // adjust match column
+                            .Select(d => d.DoctorId)
+                            .FirstOrDefault();
+                    }
+                }
+
                 var tokenString = GenerateJWTToken(dbUser);
 
                 response = Ok(new
                 {
                     uName = dbUser.Username,
                     roleId = dbUser.RoleId,
+                    doctorId = doctorId, // include here
                     token = tokenString
                 });
-
             }
 
             return response;
-
         }
+
 
         private object GenerateJWTToken(User dbUser)
         {

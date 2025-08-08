@@ -1,6 +1,7 @@
 ﻿using MediCareCMSWebApi.Models;
 using MediCareCMSWebApi.ViewModel;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using System.Data;
 
 namespace MediCareCMSWebApi.Repository
@@ -9,11 +10,14 @@ namespace MediCareCMSWebApi.Repository
     {
         private readonly IConfiguration _configuration;
         private readonly string _connectionString;
-
-        public UserRepository(IConfiguration configuration)
+        private readonly MediCareDbContext _context;
+       
+        public UserRepository(MediCareDbContext context,IConfiguration configuration)
         {
             _configuration = configuration;
             _connectionString = _configuration.GetConnectionString("DefaultConnection");
+            _context = context;
+
         }
         #region 1- Get All Users with Password
         public List<UserInputModel> GetAllUsers()
@@ -241,6 +245,12 @@ namespace MediCareCMSWebApi.Repository
                 var result = cmd.ExecuteScalar();
                 return Convert.ToInt32(result);
             }
+        }
+        public async Task<List<Role>> GetAllRolesAsync()
+        {
+            return await _context.Roles
+                                 .AsNoTracking()
+                                 .ToListAsync();
         }
 
 

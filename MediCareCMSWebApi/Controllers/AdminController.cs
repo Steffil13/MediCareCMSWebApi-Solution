@@ -114,6 +114,17 @@ namespace ClinicalManagementSystem.Controllers
 
             return CreatedAtAction(nameof(GetAllDepartments), new { id = newDepartmentId }, new { DepartmentId = newDepartmentId });
         }
+        // GET: api/admin/roles
+        [HttpGet("roles")]
+        public async Task<ActionResult<List<RoleDto>>> GetAllRoles()
+        {
+            var roles = await _userService.GetAllRolesAsync();
+
+            if (roles == null || !roles.Any())
+                return NotFound("No roles found");
+
+            return Ok(roles);
+        }
 
 
     }
