@@ -13,6 +13,7 @@ namespace MediCareCMSWebApi.Repository
 
         List<Department> GetAllDepartments();
         int AddDepartment(string? departmentName, decimal? doctorFee);
+        Task<List<Role>> GetAllRolesAsync();
 
     }
 
