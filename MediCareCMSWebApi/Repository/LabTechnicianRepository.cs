@@ -70,12 +70,11 @@ namespace MediCareCMSWebApi.Repository
         public async Task<IEnumerable<AssignedLabTestViewModel>> GetAllPrescribedLabTestsAsync()
         {
             return await _context.PrescribedLabTests
-                .Include(pl => pl.Lab)
-                .Include(pl => pl.Prescription)
-                    .ThenInclude(p => p.Appointment)
+                .Where(pl => pl.IsCompleted == false || pl.IsCompleted == null)
                 .Select(pl => new AssignedLabTestViewModel
                 {
                     PlabTestId = pl.PlabTestId,
+                    Remarks = pl.TestResults.FirstOrDefault().Remarks,
                     PrescriptionId = pl.PrescriptionId,
                     LabId = pl.LabId,
                     LabName = pl.Lab.LabName,
@@ -83,13 +82,29 @@ namespace MediCareCMSWebApi.Repository
                     NormalRange = pl.Lab.NormalRange,
                     DoctorId = pl.Prescription.Appointment.DoctorId,
                     PatientId = pl.Prescription.Appointment.PatientId,
+                    RegisterNumber = pl.Prescription.Appointment.Patient.RegisterNumber,
                     DoctorName = pl.Prescription.Appointment.Doctor.FirstName + " " + pl.Prescription.Appointment.Doctor.LastName,
                     PatientName = pl.Prescription.Appointment.Patient.FirstName + " " + pl.Prescription.Appointment.Patient.LastName,
                     Date = pl.Prescription.Appointment.AppointmentDate,
+                    // Pull Remarks directly from TestResults
+                    //Remarks = _context.TestResults
+                    //    .Where(tr => tr.PlabTestId == pl.PlabTestId)
+                    //    .OrderByDescending(tr => tr.RecordDate)
+                    //    .Select(tr => tr.Remarks)
+                    //    .FirstOrDefault(),
+
+                    // New: Pull the actual ResultValue
+                    ResultValue = _context.TestResults
+                        .Where(tr => tr.PlabTestId == pl.PlabTestId)
+                        .OrderByDescending(tr => tr.RecordDate)
+                        .Select(tr => tr.ResultValue)
+                        .FirstOrDefault(),
+
                     IsCompleted = pl.IsCompleted ?? false
                 })
                 .ToListAsync();
         }
+
 
         public async Task<bool> UpdateTestResultAsync(int id, UpdateTestResultViewModel model)
         {
@@ -103,8 +118,17 @@ namespace MediCareCMSWebApi.Repository
             testResult.RecordDate = DateTime.Now;
 
             _context.TestResults.Update(testResult);
-            await _context.SaveChangesAsync();
 
+            var prescribedLabTest = await _context.PrescribedLabTests
+                .FirstOrDefaultAsync(p => p.PlabTestId == testResult.PlabTestId);
+
+            if (prescribedLabTest != null)
+            {
+                prescribedLabTest.IsCompleted = true;
+                _context.PrescribedLabTests.Update(prescribedLabTest);
+            }
+
+            await _context.SaveChangesAsync();
             return true;
         }
     }

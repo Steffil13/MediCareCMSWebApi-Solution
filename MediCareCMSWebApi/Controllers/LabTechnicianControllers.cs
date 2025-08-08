@@ -18,97 +18,95 @@ namespace MediCareCMSWebApi.Controllers
             _labService = labService;
         }
 
-        [HttpPost("add-labtest")]
-        public async Task<IActionResult> AddLabTestAsync([FromBody] LabTechnicianViewModels.AddLabTestViewModel labTest)
+        #region Add Lab Test
+        [HttpPost("add-lab-test")]
+        public async Task<IActionResult> AddLabTest([FromBody] AddLabTestViewModel model)
         {
-            var result = await _labService.AddLabTestAsync(labTest);
-            return Ok(new { Message = "Lab test added successfully.", LabId = result });
-        }
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
+            var labId = await _labService.AddLabTestAsync(model);
+            return Ok(new { LabId = labId, Message = "Lab test added successfully" });
+        }
+        #endregion
 
         #region View All Lab Tests
-        [HttpGet("get-all-labtests")]
-        public async Task<IActionResult> GetAllLabTestsAsync([FromQuery] ViewAllLabTestsViewModel model)
+        [HttpGet("all-lab-tests")]
+        public async Task<IActionResult> GetAllLabTests([FromQuery] ViewAllLabTestsViewModel model)
         {
             var tests = await _labService.GetAllLabTestsAsync(model);
             return Ok(tests);
         }
-
         #endregion
 
-        #region Get Lab Test By ID
-        [HttpGet("get-labtest/{id}")]
-        public async Task<IActionResult> GetLabTestByIdAsync(int id)
+        #region Get Lab Test By Id
+        [HttpGet("lab-test/{id}")]
+        public async Task<IActionResult> GetLabTestById(int id)
         {
             var test = await _labService.GetLabTestByIdAsync(id);
-            if (test == null) return NotFound("Lab test not found.");
+            if (test == null)
+                return NotFound(new { Message = "Lab test not found" });
+
             return Ok(test);
         }
         #endregion
 
-
         #region Assign Lab Test to Patient
-        
-        [HttpPost("assign-labtest")]
-        public async Task<IActionResult> AssignLabTestAsync([FromBody] AssignLabTestViewModel model)
+        [HttpPost("assign-lab-test")]
+        public async Task<IActionResult> AssignLabTest([FromBody] AssignLabTestViewModel model)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             await _labService.AssignLabTestAsync(model);
-            return Ok(new { Message = "Lab test assigned and result recorded successfully." });
+            return Ok(new { Message = "Lab test assigned successfully" });
         }
-
-
         #endregion
 
-
-
         #region View Patient Lab History
-        [HttpGet("patient-history/{patientId}")]
-        public async Task<IActionResult> GetPatientLabHistoryAsync(int patientId)
+        [HttpGet("patient-lab-history/{patientId}")]
+        public async Task<IActionResult> GetPatientLabHistory(int patientId)
         {
             var history = await _labService.GetPatientLabHistoryAsync(patientId);
             return Ok(history);
         }
         #endregion
 
-        #region Bill
-
-        [HttpPost("bill")]
-        public async Task<IActionResult> GenerateLabBill([FromBody] LabBillViewModel model)
+        #region Generate Lab Bill
+        [HttpPost("generate-lab-bill")]
+        public async Task<IActionResult> GenerateLabBill([FromBody] LabBillViewModel billModel)
         {
-            await _labService.GenerateLabBillAsync(model);
-            return Ok("Lab bill generated successfully.");
-        }
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
+            await _labService.GenerateLabBillAsync(billModel);
+            return Ok(new { Message = "Lab bill generated successfully" });
+        }
         #endregion
 
-        #region View All Lab Records
-
-        [HttpGet("view-all-test-results")]
-        public async Task<IActionResult> GetAllTestResults()
+        #region View All Prescribed Lab Tests
+        [HttpGet("alllabtests")]
+        public async Task<IActionResult> GetAllPrescribedLabTests()
         {
-            var results = await _labService.GetAllTestResultsAsync();
-            return Ok(results);
+            var tests = await _labService.GetAllPrescribedLabTestsAsync();
+            return Ok(tests);
         }
-
         #endregion
 
+        #region Update Test Result
         [HttpPut("update-test-result/{id}")]
-        public async Task<IActionResult> UpdateTestResultAsync(int id, [FromBody] UpdateTestResultViewModel model)
+        public async Task<IActionResult> UpdateTestResult(int id, [FromBody] UpdateTestResultViewModel model)
         {
-            var updated = await _labService.UpdateTestResultAsync(id, model);
-            if (!updated)
-                return NotFound(new { Message = $"Test result with ID {id} not found." });
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-            return Ok(new { Message = "Test result updated successfully." });
+            var success = await _labService.UpdateTestResultAsync(id, model);
+            if (!success)
+                return NotFound(new { Message = "Test result not found" });
+
+            return Ok(new { Message = "Test result updated successfully" });
         }
-
-
-        [HttpGet("get-prescribed-labtests")]
-        public async Task<IActionResult> GetAllPrescribedLabTestsAsync()
-        {
-            var result = await _labService.GetAllPrescribedLabTestsAsync();
-            return Ok(result);
-        }
+        #endregion
     }
 }
 

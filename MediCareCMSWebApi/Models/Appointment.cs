@@ -9,6 +9,9 @@ public partial class Appointment
 {
     
     public int AppointmentId { get; set; }
+    [NotMapped]
+    public string? RegisterNumber { get; set; }
+
 
     public string? AppointmentNumber { get; set; }
 

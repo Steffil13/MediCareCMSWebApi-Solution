@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MediCareCMSWebApi.Models;
 
@@ -20,5 +21,7 @@ public partial class PrescribedLabTest
     public virtual Prescription Prescription { get; set; } = null!;
 
     public virtual ICollection<TestResult> TestResults { get; set; } = new List<TestResult>();
+
+    [NotMapped]
     public string? LabName { get; set; }
 }

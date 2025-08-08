@@ -1,21 +1,21 @@
 ﻿using MediCareCMSWebApi.Models;
+using MediCareCMSWebApi.Repository;
 using MediCareCMSWebApi.ViewModel;
-using Microsoft.EntityFrameworkCore;
 using static MediCareCMSWebApi.ViewModel.LabTechnicianViewModels;
 
 namespace MediCareCMSWebApi.Service
 {
     public class LabTechnicianService : ILabTechnicianService
     {
-        private readonly MediCareDbContext _context;
+        private readonly ILabTechnicianRepository _labTechnicianRepository;
 
-        public LabTechnicianService(MediCareDbContext context)
+        public LabTechnicianService(ILabTechnicianRepository labTechnicianRepository)
         {
-            _context = context;
+            _labTechnicianRepository = labTechnicianRepository;
         }
 
         #region Add Lab Test Inventory
-        public async Task<int> AddLabTestAsync(LabTechnicianViewModels.AddLabTestViewModel model)
+        public async Task<int> AddLabTestAsync(AddLabTestViewModel model)
         {
             var entity = new LabInventory
             {
@@ -25,31 +25,28 @@ namespace MediCareCMSWebApi.Service
                 Availability = model.Availability ?? true
             };
 
-            _context.LabInventories.Add(entity);
-            await _context.SaveChangesAsync();
-
-            return entity.LabId; // returning just the ID
+            await _labTechnicianRepository.AddLabTestAsync(entity);
+            return entity.LabId;
         }
         #endregion
 
         #region View All Lab Tests
-        public async Task<IEnumerable<LabInventory>> GetAllLabTestsAsync(ViewAllLabTestsViewModel model)
+        public Task<IEnumerable<LabInventory>> GetAllLabTestsAsync(ViewAllLabTestsViewModel model)
         {
-            return await _context.LabInventories.ToListAsync();
+            return _labTechnicianRepository.GetAllLabTestsAsync(model);
         }
         #endregion
 
         #region Get Lab Test By Id
-        public async Task<LabInventory?> GetLabTestByIdAsync(int id)
+        public Task<LabInventory?> GetLabTestByIdAsync(int id)
         {
-            return await _context.LabInventories.FindAsync(id);
+            return _labTechnicianRepository.GetLabTestByIdAsync(id);
         }
         #endregion
 
         #region Assign Lab Test to a Patient
         public async Task AssignLabTestAsync(AssignLabTestViewModel model)
         {
-            // Step 1: Add prescribed lab test
             var prescribedTest = new PrescribedLabTest
             {
                 PrescriptionId = model.PrescriptionId,
@@ -57,63 +54,18 @@ namespace MediCareCMSWebApi.Service
                 IsCompleted = false
             };
 
-            _context.PrescribedLabTests.Add(prescribedTest);
-            await _context.SaveChangesAsync(); // Save to get PlabTestId
-
-            // Step 2: Add test result
-            var testResult = new TestResult
-            {
-                PlabTestId = prescribedTest.PlabTestId,  // Use generated ID
-                ResultValue = model.ResultValue,
-                ResultStatus = model.ResultStatus,
-                Remarks = model.Remarks,
-                RecordDate = DateTime.Now,
-                CreatedDate = DateTime.Now
-            };
-
-            _context.TestResults.Add(testResult);
-            await _context.SaveChangesAsync();
+            await _labTechnicianRepository.AssignLabTestToPatientAsync(prescribedTest);
         }
-
-
-
         #endregion
 
         #region View Patient Lab History
-        public async Task<IEnumerable<PatientHistory>> GetPatientLabHistoryAsync(int patientId)
+        public Task<IEnumerable<PatientHistory>> GetPatientLabHistoryAsync(int patientId)
         {
-            return await _context.PatientHistories
-                .Where(ph => ph.PatientId == patientId)
-                .Include(ph => ph.PlabTest)
-                    .ThenInclude(pl => pl.Lab)
-                .Include(ph => ph.TestResult)
-                .ToListAsync();
+            return _labTechnicianRepository.GetPatientLabHistoryAsync(patientId);
         }
         #endregion
 
-        #region View All Lab Records
-        public async Task<List<TestResultViewModel>> GetAllTestResultsAsync()
-        {
-            return await _context.TestResults
-                .Include(tr => tr.PlabTest)
-                .ThenInclude(pt => pt.Lab)
-                .Select(tr => new TestResultViewModel
-                {
-                    TestResultId = tr.TestResultId,
-                    ResultValue = tr.ResultValue,
-                    ResultStatus = tr.ResultStatus,
-                    Remarks = tr.Remarks,
-                    RecordDate = tr.RecordDate,
-                    CreatedDate = tr.CreatedDate,
-                    PlabTestId = tr.PlabTestId,
-                    LabName = tr.PlabTest.Lab.LabName
-                })
-                .ToListAsync();
-        }
-        #endregion
-
-        #region bill
-
+        #region Generate Lab Bill
         public async Task GenerateLabBillAsync(LabBillViewModel billModel)
         {
             var bill = new LabBill
@@ -128,54 +80,22 @@ namespace MediCareCMSWebApi.Service
                 IsPaid = true
             };
 
-            await _context.LabBills.AddAsync(bill);
-            await _context.SaveChangesAsync();
+            await _labTechnicianRepository.GenerateLabBillAsync(bill);
         }
         #endregion
-        public async Task<IEnumerable<AssignedLabTestViewModel>> GetAllPrescribedLabTestsAsync()
+
+        #region View All Prescribed Lab Tests
+        public Task<IEnumerable<AssignedLabTestViewModel>> GetAllPrescribedLabTestsAsync()
         {
-            return await _context.PrescribedLabTests
-                .Include(pl => pl.Lab)
-                .Include(pl => pl.Prescription)
-                    .ThenInclude(p => p.Appointment)
-                        .ThenInclude(a => a.Doctor)   // Include Doctor
-                .Include(pl => pl.Prescription)
-                    .ThenInclude(p => p.Appointment)
-                        .ThenInclude(a => a.Patient)  // Include Patient
-                .Select(pl => new AssignedLabTestViewModel
-                {
-                    PlabTestId = pl.PlabTestId,
-                    PrescriptionId = pl.PrescriptionId,
-                    LabId = pl.LabId,
-                    LabName = pl.Lab.LabName,
-                    Price = (decimal)pl.Lab.Price,
-                    NormalRange = pl.Lab.NormalRange,
-                    DoctorId = pl.Prescription.Appointment.DoctorId,
-                    DoctorName = pl.Prescription.Appointment.Doctor.FirstName + " " + pl.Prescription.Appointment.Doctor.LastName,
-                    PatientId = pl.Prescription.Appointment.PatientId,
-                    PatientName = pl.Prescription.Appointment.Patient.FirstName + " " + pl.Prescription.Appointment.Patient.LastName,
-                    Date = pl.Prescription.Appointment.AppointmentDate,
-                    IsCompleted = pl.IsCompleted ?? false
-                })
-                .ToListAsync();
+            return _labTechnicianRepository.GetAllPrescribedLabTestsAsync();
         }
+        #endregion
 
-        public async Task<bool> UpdateTestResultAsync(int id, UpdateTestResultViewModel model)
+        #region Update Test Result
+        public Task<bool> UpdateTestResultAsync(int id, UpdateTestResultViewModel model)
         {
-            var testResult = await _context.TestResults.FindAsync(id);
-            if (testResult == null)
-                return false;
-
-            testResult.ResultValue = model.ResultValue;
-            testResult.ResultStatus = model.ResultStatus;
-            testResult.Remarks = model.Remarks;
-            testResult.RecordDate = DateTime.Now;
-
-            _context.TestResults.Update(testResult);
-            await _context.SaveChangesAsync();
-
-            return true;
+            return _labTechnicianRepository.UpdateTestResultAsync(id, model);
         }
-
+        #endregion
     }
 }

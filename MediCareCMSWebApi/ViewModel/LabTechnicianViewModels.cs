@@ -64,7 +64,6 @@
             public DateTime? CreatedDate { get; set; }
             public int? PlabTestId { get; set; }
 
-            // Optional: Include minimal Lab/Test details if needed
             public string? LabName { get; set; }
         }
 
@@ -78,23 +77,22 @@
 
         public class AssignedLabTestViewModel
         {
+           
             public int PlabTestId { get; set; }
             public int PrescriptionId { get; set; }
             public int LabId { get; set; }
+            public string? ResultValue { get; set; }
+            public string? Remarks { get; set; }
+            public string? RegisterNumber { get; set; }
             public string LabName { get; set; }
             public decimal Price { get; set; }
             public string NormalRange { get; set; }
             public int DoctorId { get; set; }
-            public string DoctorName { get; set; }         // <-- Add this
+            public string DoctorName { get; set; }        
             public int PatientId { get; set; }
-            public string PatientName { get; set; }        // <-- Add this
+            public string PatientName { get; set; }       
             public DateTime Date { get; set; }
             public bool IsCompleted { get; set; }
         }
-
-
-
-
-
     }
 }

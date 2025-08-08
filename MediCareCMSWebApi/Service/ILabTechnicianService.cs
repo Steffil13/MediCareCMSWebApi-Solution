@@ -6,44 +6,30 @@ namespace MediCareCMSWebApi.Service
 {
     public interface ILabTechnicianService
     {
-        #region Lab Inventory
+        Task<int> AddLabTestAsync(AddLabTestViewModel model);
 
-        Task<int> AddLabTestAsync(LabTechnicianViewModels.AddLabTestViewModel model);
+        // View All Lab Tests
         Task<IEnumerable<LabInventory>> GetAllLabTestsAsync(ViewAllLabTestsViewModel model);
+
+        // Get Lab Test By ID
         Task<LabInventory?> GetLabTestByIdAsync(int id);
 
+        // Assign Lab Test to Patient
+        Task AssignLabTestAsync(AssignLabTestViewModel model);
 
-
-        #endregion
-        Task<bool> UpdateTestResultAsync(int id, UpdateTestResultViewModel model);
-
-
-        #region Prescribed Lab Tests
-
-        Task AssignLabTestAsync(LabTechnicianViewModels.AssignLabTestViewModel model);
-
-        #endregion
-
-        #region Patient History
-
+        // View Patient Lab History
         Task<IEnumerable<PatientHistory>> GetPatientLabHistoryAsync(int patientId);
 
-        #endregion
-
-        Task<IEnumerable<AssignedLabTestViewModel>> GetAllPrescribedLabTestsAsync();
-
-
-        #region Lab Records
-
-        Task<List<TestResultViewModel>> GetAllTestResultsAsync();
-
-        #endregion
-
-        #region lab bill
-
+        // Generate Lab Bill
         Task GenerateLabBillAsync(LabBillViewModel billModel);
 
-        #endregion
+        // View All Prescribed Lab Tests
+        Task<IEnumerable<AssignedLabTestViewModel>> GetAllPrescribedLabTestsAsync();
 
+        // Update Test Result
+        Task<bool> UpdateTestResultAsync(int id, UpdateTestResultViewModel model);
     }
+
+
 }
+
