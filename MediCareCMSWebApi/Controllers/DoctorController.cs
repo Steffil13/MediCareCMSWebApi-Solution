@@ -22,18 +22,25 @@ namespace MediCareCMSWebApi.Controllers
         }
 
         // 🔹 1. Get Appointments (Today & Tomorrow)
-        [HttpGet("appointments")]
-        public async Task<IActionResult> GetDoctorAppointments()
+        //[HttpGet("appointments")]
+        //public async Task<IActionResult> GetDoctorAppointments()
+        //{
+        //    var roleClaim = User.FindFirst(ClaimTypes.Role)?.Value;
+        //    if (!int.TryParse(roleClaim, out int roleId))
+        //        return Unauthorized("Invalid role in token.");
+
+        //    int? doctorId = await _doctorService.GetDoctorIdByRoleIdAsync(roleId);
+        //    if (doctorId == null)
+        //        return NotFound("Doctor not found for this role.");
+
+        //    var appointments = await _appointmentService.GetAppointmentsForDoctorAsync(doctorId.Value);
+        //    return Ok(appointments);
+        //}
+
+        [HttpGet("appointments/{doctorId}")]
+        public async Task<IActionResult> GetDoctorAppointments(int doctorId)
         {
-            var roleClaim = User.FindFirst(ClaimTypes.Role)?.Value;
-            if (!int.TryParse(roleClaim, out int roleId))
-                return Unauthorized("Invalid role in token.");
-
-            int? doctorId = await _doctorService.GetDoctorIdByRoleIdAsync(roleId);
-            if (doctorId == null)
-                return NotFound("Doctor not found for this role.");
-
-            var appointments = await _appointmentService.GetAppointmentsForDoctorAsync(doctorId.Value);
+            var appointments = await _appointmentService.GetAppointmentsForDoctorAsync(doctorId);
             return Ok(appointments);
         }
 
