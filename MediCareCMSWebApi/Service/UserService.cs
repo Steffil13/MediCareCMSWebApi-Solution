@@ -45,6 +45,17 @@ namespace MediCareCMSWebApi.Service
         {
             return _userRepository.AddDepartment(departmentName, doctorFee);
         }
+        public async Task<List<RoleDto>> GetAllRolesAsync()
+        {
+            var roles = await _userRepository.GetAllRolesAsync();
+
+            // Map entity to DTO
+            return roles.Select(r => new RoleDto
+            {
+                RoleId = r.RoleId,
+                RoleName = r.RoleName
+            }).ToList();
+        }
 
     }
 
