@@ -1,4 +1,5 @@
 ﻿using MediCareCMSWebApi.Models;
+using MediCareCMSWebApi.ViewModels;
 
 namespace MediCareCMSWebApi.Repository
 {
@@ -43,6 +44,8 @@ namespace MediCareCMSWebApi.Repository
         Task<PrescribedMedicine?> GetPrescribedMedicineByIdAsync(int id);
         Task UpdatePrescribedMedicineAsync(PrescribedMedicine prescribedMedicine);
         Task UpdateMedicineInventoryAsync(MedicineInventory medicine);
+        Task<IEnumerable<MedicineInventory>> GetAllMedicinesAsync();
+
 
     }
 }

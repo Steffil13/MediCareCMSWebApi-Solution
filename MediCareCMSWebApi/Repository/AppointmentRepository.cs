@@ -74,9 +74,15 @@ namespace MediCareCMSWebApi.Repository
                 {
                     AppointmentId = a.AppointmentId,
                     PatientName = a.Patient.FirstName + " " + a.Patient.LastName,
+                    AppointmentNumber = a.AppointmentNumber,
                     AppointmentDate = a.AppointmentDate,
                     AppointmentTime = a.AppointmentTime,
-                    TokenNumber = a.TokenNumber
+                    TokenNumber = a.TokenNumber,
+                    CreatedDate = a.CreatedDate,
+                    PatientId = a.PatientId,
+                    DoctorId = a.DoctorId,
+                    ReceptionistId = a.ReceptionistId,
+                    IsConsulted = a.IsConsulted
                 })
                 .ToListAsync();
         }

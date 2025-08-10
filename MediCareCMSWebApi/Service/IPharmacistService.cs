@@ -1,4 +1,6 @@
-﻿using MediCareCMSWebApi.ViewModels;
+﻿using MediCareCMSWebApi.Models;
+using MediCareCMSWebApi.ViewModels;
+using static MediCareCMSWebApi.ViewModel.LabTechnicianViewModels;
 
 namespace MediCareCMSWebApi.Service
 {
@@ -41,6 +43,7 @@ namespace MediCareCMSWebApi.Service
         #endregion
 
         Task<bool> IssueMedicineAsync(int prescribedMedicineId);
+        Task<IEnumerable<MedicineInventory>> GetAllMedicinesAsync();
 
 
 

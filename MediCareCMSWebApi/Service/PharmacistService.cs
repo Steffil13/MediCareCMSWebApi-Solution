@@ -2,6 +2,7 @@
 using MediCareCMSWebApi.Repository;
 using MediCareCMSWebApi.Service;
 using MediCareCMSWebApi.ViewModels;
+using static MediCareCMSWebApi.ViewModel.LabTechnicianViewModels;
 
 namespace MediCareCMSWebApi.Service
 {
@@ -169,6 +170,11 @@ namespace MediCareCMSWebApi.Service
         }
 
         #endregion
+
+        public Task<IEnumerable<MedicineInventory>> GetAllMedicinesAsync()
+        {
+            return _pharmacistRepository.GetAllMedicinesAsync();
+        }
 
     }
 }
