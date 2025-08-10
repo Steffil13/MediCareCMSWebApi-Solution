@@ -66,7 +66,7 @@ namespace MediCareCMSWebApi.Service
         #endregion
 
         #region Generate Lab Bill
-        public async Task GenerateLabBillAsync(LabBillViewModel billModel)
+        public async Task<LabBill> GenerateLabBillAsync(LabBillViewModel billModel)
         {
             var bill = new LabBill
             {
@@ -81,7 +81,10 @@ namespace MediCareCMSWebApi.Service
             };
 
             await _labTechnicianRepository.GenerateLabBillAsync(bill);
+
+            return bill;  // Return the created bill object
         }
+
         #endregion
 
         #region View All Prescribed Lab Tests

@@ -72,17 +72,17 @@ namespace MediCareCMSWebApi.Controllers
         }
         #endregion
 
-        #region Generate Lab Bill
         [HttpPost("generate-lab-bill")]
         public async Task<IActionResult> GenerateLabBill([FromBody] LabBillViewModel billModel)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            await _labService.GenerateLabBillAsync(billModel);
-            return Ok(new { Message = "Lab bill generated successfully" });
+            var createdBill = await _labService.GenerateLabBillAsync(billModel);
+
+            return Ok(createdBill);
         }
-        #endregion
+
 
         #region View All Prescribed Lab Tests
         [HttpGet("alllabtests")]

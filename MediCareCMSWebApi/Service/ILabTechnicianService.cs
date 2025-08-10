@@ -21,7 +21,7 @@ namespace MediCareCMSWebApi.Service
         Task<IEnumerable<PatientHistory>> GetPatientLabHistoryAsync(int patientId);
 
         // Generate Lab Bill
-        Task GenerateLabBillAsync(LabBillViewModel billModel);
+        Task<LabBill> GenerateLabBillAsync(LabBillViewModel billModel);
 
         // View All Prescribed Lab Tests
         Task<IEnumerable<AssignedLabTestViewModel>> GetAllPrescribedLabTestsAsync();

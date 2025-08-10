@@ -57,13 +57,14 @@ namespace MediCareCMSWebApi.Repository
         }
         #endregion
 
- 
+
         #region Generate Lab Bill
-        public async Task GenerateLabBillAsync(LabBill labBill)
+        public async Task GenerateLabBillAsync(LabBill bill)
         {
-            await _context.LabBills.AddAsync(labBill);
+            _context.LabBills.Add(bill);
             await _context.SaveChangesAsync();
         }
+
         #endregion
 
         // In LabTechnicianRepository.cs
@@ -75,6 +76,7 @@ namespace MediCareCMSWebApi.Repository
                 {
                     PlabTestId = pl.PlabTestId,
                     Remarks = pl.TestResults.FirstOrDefault().Remarks,
+                    ResultValue = pl.TestResults.FirstOrDefault().ResultValue,
                     PrescriptionId = pl.PrescriptionId,
                     LabId = pl.LabId,
                     LabName = pl.Lab.LabName,
@@ -86,41 +88,46 @@ namespace MediCareCMSWebApi.Repository
                     DoctorName = pl.Prescription.Appointment.Doctor.FirstName + " " + pl.Prescription.Appointment.Doctor.LastName,
                     PatientName = pl.Prescription.Appointment.Patient.FirstName + " " + pl.Prescription.Appointment.Patient.LastName,
                     Date = pl.Prescription.Appointment.AppointmentDate,
-                    // Pull Remarks directly from TestResults
-                    //Remarks = _context.TestResults
-                    //    .Where(tr => tr.PlabTestId == pl.PlabTestId)
-                    //    .OrderByDescending(tr => tr.RecordDate)
-                    //    .Select(tr => tr.Remarks)
-                    //    .FirstOrDefault(),
-
-                    // New: Pull the actual ResultValue
-                    ResultValue = _context.TestResults
-                        .Where(tr => tr.PlabTestId == pl.PlabTestId)
-                        .OrderByDescending(tr => tr.RecordDate)
-                        .Select(tr => tr.ResultValue)
-                        .FirstOrDefault(),
-
                     IsCompleted = pl.IsCompleted ?? false
                 })
                 .ToListAsync();
         }
 
 
-        public async Task<bool> UpdateTestResultAsync(int id, UpdateTestResultViewModel model)
+        public async Task<bool> UpdateTestResultAsync(int plabTestId, UpdateTestResultViewModel model)
         {
-            var testResult = await _context.TestResults.FindAsync(id);
+            // Try to find existing TestResult
+            var testResult = await _context.TestResults
+                .FirstOrDefaultAsync(t => t.PlabTestId == plabTestId);
+
             if (testResult == null)
-                return false;
+            {
+                // Create new TestResult if none exists
+                testResult = new TestResult
+                {
+                    PlabTestId = plabTestId,
+                    ResultValue = model.ResultValue,
+                    ResultStatus = model.ResultStatus,
+                    Remarks = model.Remarks,
+                    RecordDate = DateTime.Now
+                };
 
-            testResult.ResultValue = model.ResultValue;
-            testResult.ResultStatus = model.ResultStatus;
-            testResult.Remarks = model.Remarks;
-            testResult.RecordDate = DateTime.Now;
+                _context.TestResults.Add(testResult);
+            }
+            else
+            {
+                // Update existing TestResult
+                testResult.ResultValue = model.ResultValue;
+                testResult.ResultStatus = model.ResultStatus;
+                testResult.Remarks = model.Remarks;
+                testResult.RecordDate = DateTime.Now;
 
-            _context.TestResults.Update(testResult);
+                _context.TestResults.Update(testResult);
+            }
 
+            // Update PrescribedLabTest to mark as completed
             var prescribedLabTest = await _context.PrescribedLabTests
-                .FirstOrDefaultAsync(p => p.PlabTestId == testResult.PlabTestId);
+                .FirstOrDefaultAsync(p => p.PlabTestId == plabTestId);
 
             if (prescribedLabTest != null)
             {
@@ -131,6 +138,7 @@ namespace MediCareCMSWebApi.Repository
             await _context.SaveChangesAsync();
             return true;
         }
+
     }
 }
 
