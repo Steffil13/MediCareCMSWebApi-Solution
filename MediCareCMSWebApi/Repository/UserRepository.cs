@@ -89,7 +89,7 @@ namespace MediCareCMSWebApi.Repository
                 cmd.Parameters.AddWithValue("@Contact", user.Contact ?? (object)DBNull.Value);
 
                 // DepartmentId only for doctors; otherwise DBNull
-                if (user.RoleName == "Doctor")
+                if (user.RoleId == 5)
                     cmd.Parameters.AddWithValue("@DepartmentId", user.DepartmentId ?? (object)DBNull.Value);
                 else
                     cmd.Parameters.AddWithValue("@DepartmentId", DBNull.Value);
