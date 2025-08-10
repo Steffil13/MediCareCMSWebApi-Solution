@@ -22,10 +22,16 @@ namespace MediCareCMSWebApi.Repository
                 .Select(a => new AppointmentDto
                 {
                     AppointmentId = a.AppointmentId,
-                    PatientId = a.PatientId,
+                    AppointmentNumber = a.AppointmentNumber,
+                    AppointmentDate = a.AppointmentDate,
                     AppointmentTime = a.AppointmentTime,
-                    AppointmentDate = a.AppointmentDate
-                    // Add more fields as needed
+                    TokenNumber = a.TokenNumber,
+                    CreatedDate = a.CreatedDate,
+                    PatientId = a.PatientId,
+                    DoctorId = a.DoctorId,
+                    ReceptionistId = a.ReceptionistId,
+                    IsConsulted = a.IsConsulted
+
                 })
                 .ToListAsync();
         }

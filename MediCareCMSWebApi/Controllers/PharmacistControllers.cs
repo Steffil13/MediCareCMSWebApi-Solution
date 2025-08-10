@@ -2,6 +2,7 @@
 using MediCareCMSWebApi.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using static MediCareCMSWebApi.ViewModel.LabTechnicianViewModels;
 
 namespace MediCareCMSWebApi.Controllers
 {
@@ -29,6 +30,15 @@ namespace MediCareCMSWebApi.Controllers
             return Ok("Medicine added successfully.");
         }
 
+        #endregion
+
+        #region View All medicines
+        [HttpGet("all-medicines")]
+        public async Task<IActionResult> GetAllMedicines()
+        {
+            var medicines = await _pharmacistService.GetAllMedicinesAsync();
+            return Ok(medicines);
+        }
         #endregion
 
         #region GetMedicineById

@@ -1,6 +1,8 @@
 ﻿using MediCareCMSWebApi.Models;
 using MediCareCMSWebApi.Repository;
+using MediCareCMSWebApi.ViewModels;
 using Microsoft.EntityFrameworkCore;
+using static MediCareCMSWebApi.ViewModel.LabTechnicianViewModels;
 
 namespace MediCareCMSWebApi.Repository
 {
@@ -105,6 +107,13 @@ namespace MediCareCMSWebApi.Repository
             await _context.SaveChangesAsync();
         }
 
+        #endregion
+
+        #region View All Lab Tests
+        public async Task<IEnumerable<MedicineInventory>> GetAllMedicinesAsync()
+        {
+            return await _context.MedicineInventories.ToListAsync();
+        }
         #endregion
 
 
