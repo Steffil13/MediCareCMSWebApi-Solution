@@ -86,7 +86,7 @@ namespace MediCareCMSWebApi.Repository
 
         #endregion
 
-        #region IssueMedicine - Helpers
+        #region IssueMedicine
 
         public async Task<PrescribedMedicine?> GetPrescribedMedicineByIdAsync(int id)
         {
@@ -117,6 +117,45 @@ namespace MediCareCMSWebApi.Repository
         #endregion
 
 
+        public async Task<IEnumerable<PatientHistory>> GetAllPatientHistoriesAsync()
+        {
+            return await _context.PatientHistories
+                .Include(ph => ph.Pmedicine)
+                    .ThenInclude(pm => pm.Medicine)
+                .Include(ph => ph.PlabTest)
+                    .ThenInclude(pl => pl.Lab)
+                .Include(ph => ph.TestResult)
+                .ToListAsync();
+        }
+
+
+        public async Task<PharmacyBill?> GetBillByPrescribedMedicineIdAsync(int pmId)
+        {
+            return await _context.PharmacyBills
+                .FirstOrDefaultAsync(b => b.PmedicineId == pmId);
+        }
+
+        public async Task AddPharmacyBillAsync(PharmacyBill bill)
+        {
+            await _context.PharmacyBills.AddAsync(bill);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<List<BillHistory>> GetBillHistoryAsync()
+        {
+            return await _context.LabBills
+                .Select(b => new BillHistory
+                {
+                    LabBillId = b.LabBillId,
+                    LabBillNumber = b.LabBillNumber,
+                    PatientName = b.Patient.FirstName + " " + b.Patient.LastName,
+                    DoctorName = b.Doctor.FirstName + " " + b.Doctor.LastName,
+                    TotalAmount = b.TotalAmount,
+                    IssuedDate = b.IssuedDate,
+                    IsPaid = b.IsPaid
+                })
+                .ToListAsync();
+        }
 
 
     }

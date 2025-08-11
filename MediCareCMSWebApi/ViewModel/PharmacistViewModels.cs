@@ -27,6 +27,34 @@
     {
         public string MedicineName { get; set; } = null!;
         public string Dosage { get; set; } = null!;
+        public string Duration { get; set; } = null!;
+
+        public int PMedicineId { get; set; }
+
+        public decimal Price { get; set; }
+    }
+
+
+    public class BillHistory
+    {
+        public int LabBillId { get; set; }
+        public string LabBillNumber { get; set; }
+        public string PatientName { get; set; }
+        public string DoctorName { get; set; }
+        public decimal TotalAmount { get; set; }
+        public DateTime? IssuedDate { get; set; }
+        public bool? IsPaid { get; set; }
+    }
+
+
+
+    public class LabTestDetailsViewModel
+    {
+        public int LabTestId { get; set; }
+        public int PrescriptionId { get; set; }
+        public int PatientId { get; set; }
+        public int DoctorId { get; set; }
+        public decimal Price { get; set; }
     }
 
 
@@ -48,6 +76,7 @@
         public int PmedicineId { get; set; }
         public int PharmacistId { get; set; }
         public decimal TotalAmount { get; set; }
+        public string PharmacyBillId { get; set; } = string.Empty;
     }
 
 

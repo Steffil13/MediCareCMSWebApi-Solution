@@ -33,6 +33,7 @@ namespace MediCareCMSWebApi.Controllers
             {
                 // Default null in case not a doctor
                 int? doctorId = null;
+                int? pharmacistId = null;
 
                 // If this user is a doctor, fetch doctorId
                 if (dbUser.RoleName.Equals("Doctor", StringComparison.OrdinalIgnoreCase))
@@ -44,6 +45,10 @@ namespace MediCareCMSWebApi.Controllers
                             .Where(d => d.Username == dbUser.Username) // adjust match column
                             .Select(d => d.DoctorId)
                             .FirstOrDefault();
+                        pharmacistId = context.Pharmacists
+                            .Where(p => p.Username == dbUser.Username) // adjust match column
+                            .Select(p => p.PharmacistId)
+                            .FirstOrDefault();
                     }
                 }
 
@@ -54,6 +59,7 @@ namespace MediCareCMSWebApi.Controllers
                     uName = dbUser.Username,
                     roleId = dbUser.RoleId,
                     doctorId = doctorId, // include here
+                    pharmacistId = pharmacistId, // include here
                     token = tokenString
                 });
             }

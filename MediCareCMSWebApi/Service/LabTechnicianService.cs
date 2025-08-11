@@ -17,17 +17,23 @@ namespace MediCareCMSWebApi.Service
         #region Add Lab Test Inventory
         public async Task<int> AddLabTestAsync(AddLabTestViewModel model)
         {
-            var entity = new LabInventory
+            var labInventory = new LabInventory
             {
                 LabName = model.LabName,
                 NormalRange = model.NormalRange,
-                Price = model.Price ?? 0,
-                Availability = model.Availability ?? true
+                Price = model.Price,
+                Availability = model.Availability
+                // Map other properties as needed
             };
 
-            await _labTechnicianRepository.AddLabTestAsync(entity);
-            return entity.LabId;
+            await _labTechnicianRepository.AddLabTestAsync(labInventory);
+
+            // If you want to return the newly created LabInventory ID, 
+            // you should return it from repository method or fetch it after save.
+
+            return labInventory.LabId; // Assuming LabId is generated on save
         }
+
         #endregion
 
         #region View All Lab Tests
@@ -38,7 +44,7 @@ namespace MediCareCMSWebApi.Service
         #endregion
 
         #region Get Lab Test By Id
-        public Task<LabInventory?> GetLabTestByIdAsync(int id)
+        public Task<PrescribedLabTest?> GetLabTestByIdAsync(int id)
         {
             return _labTechnicianRepository.GetLabTestByIdAsync(id);
         }
@@ -68,24 +74,16 @@ namespace MediCareCMSWebApi.Service
         #region Generate Lab Bill
         public async Task<LabBill> GenerateLabBillAsync(LabBillViewModel billModel)
         {
-            var bill = new LabBill
-            {
-                LabBillNumber = $"LABBILL-{DateTime.Now:yyyyMMddHHmmss}",
-                PrescriptionId = billModel.PrescriptionId,
-                LabTechnicianId = billModel.LabTechnicianId,
-                PatientId = billModel.PatientId,
-                DoctorId = billModel.DoctorId,
-                TotalAmount = billModel.TotalAmount,
-                IssuedDate = DateTime.Now,
-                IsPaid = true
-            };
-
-            await _labTechnicianRepository.GenerateLabBillAsync(bill);
-
-            return bill;  // Return the created bill object
+            return await _labTechnicianRepository.GenerateLabBillAsync(billModel);
         }
 
         #endregion
+
+        public async Task<List<TestResultHistoryDto>> GetTestResultHistoryAsync()
+        {
+            return await _labTechnicianRepository.GetTestResultHistoryAsync();
+        }
+
 
         #region View All Prescribed Lab Tests
         public Task<IEnumerable<AssignedLabTestViewModel>> GetAllPrescribedLabTestsAsync()

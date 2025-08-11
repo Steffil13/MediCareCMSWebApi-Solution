@@ -39,6 +39,20 @@
         }
         #endregion
 
+        public class TestResultHistoryDto
+        {
+            public int TestResultId { get; set; }
+            public string PatientName { get; set; }
+            public string TestName { get; set; }
+            public string ResultValue { get; set; }
+            public string Remarks { get; set; }
+            public bool? ResultStatus { get; set; }
+            public DateTime? RecordDate { get; set; }
+            public string? RegisterNumber { get; set; }
+
+        }
+
+
         #region View All Lab Tests ViewModel
         public class ViewAllLabTestsViewModel
         {

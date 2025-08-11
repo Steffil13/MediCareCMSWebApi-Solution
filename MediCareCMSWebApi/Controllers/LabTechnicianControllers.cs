@@ -78,7 +78,7 @@ namespace MediCareCMSWebApi.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var createdBill = await _labService.GenerateLabBillAsync(billModel);
+            LabBill createdBill = await _labService.GenerateLabBillAsync(billModel);
 
             return Ok(createdBill);
         }
@@ -107,6 +107,18 @@ namespace MediCareCMSWebApi.Controllers
             return Ok(new { Message = "Test result updated successfully" });
         }
         #endregion
+
+        #region history
+
+        [HttpGet("history")]
+        public async Task<IActionResult> GetTestResultHistory()
+        {
+            var history = await _labService.GetTestResultHistoryAsync();
+            return Ok(history);
+        }
+        #endregion
+
+
     }
 }
 

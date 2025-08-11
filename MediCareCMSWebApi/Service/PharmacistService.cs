@@ -66,11 +66,15 @@ namespace MediCareCMSWebApi.Service
                 PrescriptionId = p.PrescriptionId,
                 PatientId = p.Appointment?.PatientId ?? 0,
                 DoctorId = p.Appointment?.DoctorId ?? 0,
+
                 DatePrescribed = p.CreatedDate ?? DateTime.MinValue,
                 Medicines = p.PrescribedMedicines.Select(m => new PrescribedMedicineViewModel
                 {
                     MedicineName = m.Medicine?.MedicineName ?? "N/A",
-                    Dosage = m.Dosage ?? "N/A"
+                    Dosage = m.Dosage ?? "N/A",
+                    Duration = m.Duration ?? "N/A",
+                    PMedicineId = m.PmedicineId
+
                 }).ToList()
             }).ToList();
         }
@@ -93,7 +97,12 @@ namespace MediCareCMSWebApi.Service
                 Medicines = prescription.PrescribedMedicines.Select(m => new PrescribedMedicineViewModel
                 {
                     MedicineName = m.Medicine?.MedicineName ?? "N/A",
-                    Dosage = m.Dosage ?? "N/A"
+                    Price = m.Medicine?.Price ?? 0,
+                    Dosage = m.Dosage ?? "N/A",
+                    Duration = m.Duration ?? "N/A",
+                    PMedicineId = m.PmedicineId
+                    
+
                 }).ToList()
             };
         }
@@ -122,20 +131,21 @@ namespace MediCareCMSWebApi.Service
 
         #region GenerateBill
 
-        public async Task GenerateBillAsync(PharmacyBillViewModel billModel)
+        public async Task<PharmacyBill> GenerateBillAsync(PharmacyBillViewModel model)
         {
             var bill = new PharmacyBill
             {
-                PharmacyBillId = $"BILL-{DateTime.Now:yyyyMMddHHmmss}",
-                PrescriptionId = billModel.PrescriptionId,
-                PmedicineId = billModel.PmedicineId,
-                PharmacistId = billModel.PharmacistId,
-                TotalAmount = billModel.TotalAmount,
-                IssuedDate = DateTime.Now,
+                PharmacyBillId = model.PharmacyBillId,
+                PmedicineId = model.PmedicineId,
+                PrescriptionId = model.PrescriptionId,
+                PharmacistId = model.PharmacistId,
+                TotalAmount = model.TotalAmount,
+                IssuedDate = DateTime.UtcNow,
                 IsIssued = true
             };
 
-            await _pharmacistRepository.GeneratePharmacyBillAsync(bill);
+            await _pharmacistRepository.AddPharmacyBillAsync(bill);
+            return bill;
         }
 
         #endregion
@@ -171,9 +181,48 @@ namespace MediCareCMSWebApi.Service
 
         #endregion
 
+        public async Task<List<BillHistory>> GetBillHistoryAsync()
+        {
+            return await _pharmacistRepository.GetBillHistoryAsync();
+        }
+
+
         public Task<IEnumerable<MedicineInventory>> GetAllMedicinesAsync()
         {
             return _pharmacistRepository.GetAllMedicinesAsync();
+        }
+
+
+
+        public async Task<PharmacyBillViewModel?> GetBillByPrescribedMedicineIdAsync(int pmId)
+        {
+            var bill = await _pharmacistRepository.GetBillByPrescribedMedicineIdAsync(pmId);
+
+            if (bill == null) return null;
+
+            return new PharmacyBillViewModel
+            {
+                PharmacyBillId = bill.PharmacyBillId ?? string.Empty,
+                PmedicineId = bill.PmedicineId ?? 0,
+                PrescriptionId = bill.PrescriptionId ?? 0,
+                PharmacistId = bill.PharmacistId ?? 0,
+                TotalAmount = bill.TotalAmount ?? 0m
+            };
+        }
+        public async Task<IEnumerable<PatientHistoryViewModel>> GetAllPatientHistoriesAsync()
+        {
+            var histories = await _pharmacistRepository.GetAllPatientHistoriesAsync();
+
+            return histories.Select(h => new PatientHistoryViewModel
+            {
+                HistoryId = h.HistoryId,
+                PatientId = h.PatientId ?? 0,
+                AppointmentId = h.AppointmentId ?? 0,
+                PrescriptionId = h.PrescriptionId ?? 0,
+                MedicineName = h.Pmedicine?.Medicine?.MedicineName ?? "N/A",
+                LabTestName = h.PlabTest?.Lab?.LabName ?? "N/A",
+                TestResult = h.TestResult?.ResultValue ?? "Pending"
+            }).ToList();
         }
 
     }

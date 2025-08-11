@@ -18,6 +18,8 @@ public partial class Prescription
 
     public string? Notes { get; set; }
 
+    public int PatientId { get; set; }
+    public int DoctorId { get; set; }
     public DateTime? CreatedDate { get; set; }
 
     public virtual Appointment Appointment { get; set; } = null!;
