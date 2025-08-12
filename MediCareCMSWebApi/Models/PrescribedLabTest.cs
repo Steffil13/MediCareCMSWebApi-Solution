@@ -24,4 +24,5 @@ public partial class PrescribedLabTest
 
     [NotMapped]
     public string? LabName { get; set; }
+    public int LabTechnicianId { get; set; }
 }

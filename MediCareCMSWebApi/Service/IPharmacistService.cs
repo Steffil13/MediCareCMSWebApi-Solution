@@ -38,13 +38,20 @@ namespace MediCareCMSWebApi.Service
 
         #region GenerateBill
 
-        Task GenerateBillAsync(PharmacyBillViewModel billModel);
+        Task<PharmacyBill> GenerateBillAsync(PharmacyBillViewModel model);
 
         #endregion
 
         Task<bool> IssueMedicineAsync(int prescribedMedicineId);
+
+        Task<List<BillHistory>> GetBillHistoryAsync();
+
         Task<IEnumerable<MedicineInventory>> GetAllMedicinesAsync();
 
+        Task<PharmacyBillViewModel?> GetBillByPrescribedMedicineIdAsync(int pmId);
+
+
+        Task<IEnumerable<PatientHistoryViewModel>> GetAllPatientHistoriesAsync();
 
 
     }

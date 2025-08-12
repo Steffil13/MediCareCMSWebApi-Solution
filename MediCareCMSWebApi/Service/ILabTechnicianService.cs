@@ -12,7 +12,7 @@ namespace MediCareCMSWebApi.Service
         Task<IEnumerable<LabInventory>> GetAllLabTestsAsync(ViewAllLabTestsViewModel model);
 
         // Get Lab Test By ID
-        Task<LabInventory?> GetLabTestByIdAsync(int id);
+        Task<PrescribedLabTest?> GetLabTestByIdAsync(int id);
 
         // Assign Lab Test to Patient
         Task AssignLabTestAsync(AssignLabTestViewModel model);
@@ -23,11 +23,15 @@ namespace MediCareCMSWebApi.Service
         // Generate Lab Bill
         Task<LabBill> GenerateLabBillAsync(LabBillViewModel billModel);
 
+
         // View All Prescribed Lab Tests
         Task<IEnumerable<AssignedLabTestViewModel>> GetAllPrescribedLabTestsAsync();
 
         // Update Test Result
         Task<bool> UpdateTestResultAsync(int id, UpdateTestResultViewModel model);
+
+        Task<List<TestResultHistoryDto>> GetTestResultHistoryAsync();
+
     }
 
 

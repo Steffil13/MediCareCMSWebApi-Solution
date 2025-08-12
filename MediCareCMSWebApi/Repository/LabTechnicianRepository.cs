@@ -29,9 +29,9 @@ namespace MediCareCMSWebApi.Repository
         #endregion
 
         #region Get Lab Test by ID
-        public async Task<LabInventory?> GetLabTestByIdAsync(int id)
+        public async Task<PrescribedLabTest?> GetLabTestByIdAsync(int id)
         {
-            return await _context.LabInventories.FindAsync(id);
+            return await _context.PrescribedLabTests.FindAsync(id);
         }
         #endregion
 
@@ -59,10 +59,25 @@ namespace MediCareCMSWebApi.Repository
 
 
         #region Generate Lab Bill
-        public async Task GenerateLabBillAsync(LabBill bill)
+        public async Task<LabBill> GenerateLabBillAsync(LabBillViewModel billModel)
         {
-            _context.LabBills.Add(bill);
+            var labBill = new LabBill
+            {
+                LabBillNumber = $"LABBILL-{DateTime.UtcNow:yyyyMMddHHmmss}",
+                PatientId = billModel.PatientId,
+                
+                PrescriptionId = billModel.PrescriptionId,
+                DoctorId = billModel.DoctorId,
+                LabTechnicianId = billModel.LabTechnicianId,
+                TotalAmount = billModel.TotalAmount,
+                IssuedDate = DateTime.UtcNow,
+                IsPaid = false
+            };
+
+            _context.LabBills.Add(labBill);
             await _context.SaveChangesAsync();
+
+            return labBill;
         }
 
         #endregion
@@ -125,7 +140,6 @@ namespace MediCareCMSWebApi.Repository
                 _context.TestResults.Update(testResult);
             }
 
-            // Update PrescribedLabTest to mark as completed
             var prescribedLabTest = await _context.PrescribedLabTests
                 .FirstOrDefaultAsync(p => p.PlabTestId == plabTestId);
 
@@ -138,6 +152,38 @@ namespace MediCareCMSWebApi.Repository
             await _context.SaveChangesAsync();
             return true;
         }
+
+        public async Task<List<LabBill>> GetBillHistoryAsync()
+        {
+            return await _context.LabBills
+                .Include(b => b.Patient)
+                .Include(b => b.Doctor)
+                .Include(b => b.Prescription)
+                .OrderByDescending(b => b.IssuedDate)
+                .ToListAsync();
+        }
+
+        public async Task<List<TestResultHistoryDto>> GetTestResultHistoryAsync()
+        {
+            return await _context.TestResults
+                .Select(tr => new TestResultHistoryDto
+                {
+                       RegisterNumber = tr.PlabTest.Prescription.Appointment.Patient.RegisterNumber,
+
+                    TestResultId = tr.TestResultId,
+                    PatientName = tr.PlabTest.Prescription.Appointment.Patient.FirstName + " " +
+                                  tr.PlabTest.Prescription.Appointment.Patient.LastName,
+                    TestName = tr.PlabTest.Lab.LabName, // from LabInventory
+                    ResultValue = tr.ResultValue,
+                    Remarks = tr.Remarks,
+                    RecordDate = tr.RecordDate,
+                    ResultStatus = tr.ResultStatus
+                })
+                .ToListAsync();
+        }
+
+
+
 
     }
 }
