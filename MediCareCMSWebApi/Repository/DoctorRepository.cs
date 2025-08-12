@@ -38,9 +38,11 @@ namespace MediCareCMSWebApi.Repository
 
         public async Task<CreatePrescriptionDto> CreatePrescriptionAsync(CreatePrescriptionDto dto)
         {
+            // 1️⃣ Create the prescription entity
             var entity = new Prescription
             {
                 AppointmentId = dto.AppointmentId,
+                Symptoms = dto.Symptoms,
                 Diagnosis = dto.Diagnosis,
                 Notes = dto.Notes,
                 CreatedDate = DateTime.Now
@@ -49,6 +51,18 @@ namespace MediCareCMSWebApi.Repository
             _context.Prescriptions.Add(entity);
             await _context.SaveChangesAsync();
 
+            // 2️⃣ Update isConsulted = true in the appointment
+            var appointment = await _context.Appointments
+                .FirstOrDefaultAsync(a => a.AppointmentId == dto.AppointmentId);
+
+            if (appointment != null)
+            {
+                appointment.IsConsulted = true;
+                _context.Appointments.Update(appointment);
+                await _context.SaveChangesAsync();
+            }
+
+            // 3️⃣ Return DTO with generated PrescriptionId
             dto.PrescriptionId = entity.PrescriptionId;
             return dto;
         }
@@ -73,7 +87,7 @@ namespace MediCareCMSWebApi.Repository
             var entity = new PrescribedLabTest
             {
                 PrescriptionId = dto.PrescriptionId,
-                LabName = dto.LabName
+                LabId = dto.LabId
             };
 
             _context.PrescribedLabTests.Add(entity);
