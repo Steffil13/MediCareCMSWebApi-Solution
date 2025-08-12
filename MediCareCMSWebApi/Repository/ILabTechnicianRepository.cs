@@ -14,7 +14,11 @@ namespace MediCareCMSWebApi.Repository
         #endregion
 
         #region Get Lab Test by ID
-        Task<PrescribedLabTest?> GetLabTestByIdAsync(int id);
+        Task<LabTestDetailsDto?> GetLabTestByIdAsync(int id);
+        #endregion
+
+        #region
+        Task<LabBill?> GetBillByIdAsync(int id);
         #endregion
 
         #region Assign Lab Test to Patient (Prescription-based)
@@ -35,6 +39,8 @@ namespace MediCareCMSWebApi.Repository
         #endregion
 
         Task<bool> UpdateTestResultAsync(int id, UpdateTestResultViewModel model);
+
+
 
 
         Task<List<TestResultHistoryDto>> GetTestResultHistoryAsync();

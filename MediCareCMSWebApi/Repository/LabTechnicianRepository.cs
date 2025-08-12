@@ -1,4 +1,5 @@
 ﻿using MediCareCMSWebApi.Models;
+using MediCareCMSWebApi.ViewModels;
 using Microsoft.EntityFrameworkCore;
 using static MediCareCMSWebApi.ViewModel.LabTechnicianViewModels;
 
@@ -29,10 +30,36 @@ namespace MediCareCMSWebApi.Repository
         #endregion
 
         #region Get Lab Test by ID
-        public async Task<PrescribedLabTest?> GetLabTestByIdAsync(int id)
+        public async Task<LabTestDetailsDto?> GetLabTestByIdAsync(int id)
         {
-            return await _context.PrescribedLabTests.FindAsync(id);
+            return await _context.PrescribedLabTests
+                .Where(pl => pl.PlabTestId == id)
+                .Select(pl => new LabTestDetailsDto
+                {
+                    PlabTestId = pl.PlabTestId,
+                    PrescriptionId = pl.PrescriptionId,
+                    IsCompleted = pl.IsCompleted,
+                    LabId = pl.LabId,
+                    LabName = pl.Lab.LabName,               // Assuming Lab navigation is configured
+                    LabTechnicianId = pl.LabTechnicianId,
+                    DoctorId = pl.Prescription.Appointment.DoctorId,
+                    PatientId = pl.Prescription.Appointment.PatientId
+                })
+                .FirstOrDefaultAsync();
         }
+
+        #endregion
+
+        #region get labbill by id
+        public async Task<LabBill> GetBillByIdAsync(int id)
+        {
+            var values = await _context.LabBills
+                .Include(a=> a.Doctor)
+                .Include(a=> a.Patient)
+                .FirstOrDefaultAsync(d => d.LabBillId == id);
+            return values;
+        }
+
         #endregion
 
         #region Assign Lab Test to Patient
@@ -68,10 +95,10 @@ namespace MediCareCMSWebApi.Repository
                 
                 PrescriptionId = billModel.PrescriptionId,
                 DoctorId = billModel.DoctorId,
-                LabTechnicianId = billModel.LabTechnicianId,
-                TotalAmount = billModel.TotalAmount,
+                LabTechnicianId = 1,
+                TotalAmount = 300,
                 IssuedDate = DateTime.UtcNow,
-                IsPaid = false
+                IsPaid = true
             };
 
             _context.LabBills.Add(labBill);

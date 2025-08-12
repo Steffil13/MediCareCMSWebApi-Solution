@@ -44,10 +44,18 @@ namespace MediCareCMSWebApi.Service
         #endregion
 
         #region Get Lab Test By Id
-        public Task<PrescribedLabTest?> GetLabTestByIdAsync(int id)
+        public Task<LabTestDetailsDto?> GetLabTestByIdAsync(int id)
         {
             return _labTechnicianRepository.GetLabTestByIdAsync(id);
         }
+
+        #endregion
+        #region Get Lab Bill By Id
+        public Task<LabBill> GetBillByIdAsync(int id)
+        {
+            return _labTechnicianRepository.GetBillByIdAsync(id);
+        }
+
         #endregion
 
         #region Assign Lab Test to a Patient

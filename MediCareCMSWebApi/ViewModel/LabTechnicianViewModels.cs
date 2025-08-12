@@ -12,6 +12,20 @@
         }
         #endregion
 
+        public class LabTestDetailsDto
+        {
+            public int PlabTestId { get; set; }
+            public int PrescriptionId { get; set; }
+            public bool? IsCompleted { get; set; }
+            public int LabId { get; set; }
+            public string? LabName { get; set; }
+            public int LabTechnicianId { get; set; }
+            public int DoctorId { get; set; }
+            public int PatientId { get; set; }
+            public decimal? Price { get; set; }
+        }
+
+
         #region Assign Lab Test ViewModel
         public class AssignLabTestViewModel
         {

@@ -32,6 +32,7 @@
         public int PMedicineId { get; set; }
 
         public decimal Price { get; set; }
+        public bool? IsIssued { get; set; } 
     }
 
 
@@ -44,6 +45,22 @@
         public decimal TotalAmount { get; set; }
         public DateTime? IssuedDate { get; set; }
         public bool? IsPaid { get; set; }
+    }
+
+    public class PharmacyBillHistoryViewModel
+    {
+        public int PharmacyId { get; set; }
+        public string? PharmacyBillId { get; set; }
+        public int? PmedicineId { get; set; }
+        public string? MedicineName { get; set; } // from PrescribedMedicine/Medicine table
+        public int? PrescriptionId { get; set; }
+        public string? PatientName { get; set; } // from Prescription -> Patient
+        public string? DoctorName { get; set; }  // from Prescription -> Doctor
+        public int? PharmacistId { get; set; }
+        public string? PharmacistName { get; set; } // from Pharmacist
+        public decimal? TotalAmount { get; set; }
+        public DateTime? IssuedDate { get; set; }
+        public bool? IsIssued { get; set; }
     }
 
 

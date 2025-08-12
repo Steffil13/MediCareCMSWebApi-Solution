@@ -40,14 +40,25 @@ namespace MediCareCMSWebApi.Controllers
         #endregion
 
         #region Get Lab Test By Id
-        [HttpGet("lab-test/{id}")]
+        [HttpGet("labtest/{id}")]
         public async Task<IActionResult> GetLabTestById(int id)
         {
-            var test = await _labService.GetLabTestByIdAsync(id);
-            if (test == null)
-                return NotFound(new { Message = "Lab test not found" });
+            var labTest = await _labService.GetLabTestByIdAsync(id);
+            if (labTest == null)
+                return NotFound();
 
-            return Ok(test);
+            return Ok(labTest);
+        }
+        #endregion
+        #region Get Lab Test By Id
+        [HttpGet("labBill/{id}")]
+        public async Task<IActionResult> GetBillById(int id)
+        {
+            var labBill = await _labService.GetBillByIdAsync(id);
+            if (labBill == null)
+                return NotFound();
+
+            return Ok(labBill);
         }
         #endregion
 

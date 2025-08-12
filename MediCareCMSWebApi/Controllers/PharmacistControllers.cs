@@ -115,13 +115,9 @@ namespace MediCareCMSWebApi.Controllers
 
 
         [HttpGet("bill-history")]
-        public async Task<IActionResult> GetBillHistory()
+        public async Task<IActionResult> GetAll()
         {
-            var bills = await _pharmacistService.GetBillHistoryAsync();
-
-            if (bills == null || bills.Count == 0)
-                return NotFound("No bill history found.");
-
+            var bills = await _pharmacistService.GetAllPharmacyBillsAsync();
             return Ok(bills);
         }
 

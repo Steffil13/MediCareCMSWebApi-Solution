@@ -43,7 +43,7 @@ namespace MediCareCMSWebApi.Repository
 
         Task<PrescribedMedicine?> GetPrescribedMedicineByIdAsync(int id);
 
-        Task<List<BillHistory>> GetBillHistoryAsync();
+        Task<List<PharmacyBillHistoryViewModel>> GetAllPharmacyBillsAsync();
 
         Task UpdatePrescribedMedicineAsync(PrescribedMedicine prescribedMedicine);
         Task UpdateMedicineInventoryAsync(MedicineInventory medicine);

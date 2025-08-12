@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MediCareCMSWebApi.Models;
 
@@ -17,10 +18,13 @@ public partial class Prescription
     public string? Diagnosis { get; set; }
 
     public string? Notes { get; set; }
-
+    [NotMapped]
     public int PatientId { get; set; }
+    [NotMapped]
     public int DoctorId { get; set; }
     public DateTime? CreatedDate { get; set; }
+    [NotMapped]
+    public bool? IsIssued { get; set; }
 
     public virtual Appointment Appointment { get; set; } = null!;
 

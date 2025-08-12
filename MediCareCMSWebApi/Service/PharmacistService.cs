@@ -2,6 +2,7 @@
 using MediCareCMSWebApi.Repository;
 using MediCareCMSWebApi.Service;
 using MediCareCMSWebApi.ViewModels;
+using NuGet.Protocol.Core.Types;
 using static MediCareCMSWebApi.ViewModel.LabTechnicianViewModels;
 
 namespace MediCareCMSWebApi.Service
@@ -68,14 +69,17 @@ namespace MediCareCMSWebApi.Service
                 DoctorId = p.Appointment?.DoctorId ?? 0,
 
                 DatePrescribed = p.CreatedDate ?? DateTime.MinValue,
-                Medicines = p.PrescribedMedicines.Select(m => new PrescribedMedicineViewModel
-                {
-                    MedicineName = m.Medicine?.MedicineName ?? "N/A",
-                    Dosage = m.Dosage ?? "N/A",
-                    Duration = m.Duration ?? "N/A",
-                    PMedicineId = m.PmedicineId
+                Medicines = p.PrescribedMedicines
+                .Where(m => m.IsIssued != true)  // Only medicines NOT issued yet (false or null)
+                .Select(m => new PrescribedMedicineViewModel
+                    {
+                        MedicineName = m.Medicine?.MedicineName ?? "N/A",
+                        Dosage = m.Dosage ?? "N/A",
+                        Duration = m.Duration ?? "N/A",
+                        PMedicineId = m.PmedicineId,
+                        IsIssued = m.IsIssued
 
-                }).ToList()
+                    }).ToList()
             }).ToList();
         }
 
@@ -100,7 +104,8 @@ namespace MediCareCMSWebApi.Service
                     Price = m.Medicine?.Price ?? 0,
                     Dosage = m.Dosage ?? "N/A",
                     Duration = m.Duration ?? "N/A",
-                    PMedicineId = m.PmedicineId
+                    PMedicineId = m.PmedicineId,
+                    IsIssued = m.IsIssued
                     
 
                 }).ToList()
@@ -172,6 +177,7 @@ namespace MediCareCMSWebApi.Service
             // Mark as issued
             prescribedMedicine.IsIssued = true;
 
+
             // Update both
             await _pharmacistRepository.UpdateMedicineInventoryAsync(medicine);
             await _pharmacistRepository.UpdatePrescribedMedicineAsync(prescribedMedicine);
@@ -181,9 +187,9 @@ namespace MediCareCMSWebApi.Service
 
         #endregion
 
-        public async Task<List<BillHistory>> GetBillHistoryAsync()
+        public async Task<IEnumerable<PharmacyBillHistoryViewModel>> GetAllPharmacyBillsAsync()
         {
-            return await _pharmacistRepository.GetBillHistoryAsync();
+            return await _pharmacistRepository.GetAllPharmacyBillsAsync();
         }
 
 

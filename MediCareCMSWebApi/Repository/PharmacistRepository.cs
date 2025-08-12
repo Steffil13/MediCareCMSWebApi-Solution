@@ -40,10 +40,13 @@ namespace MediCareCMSWebApi.Repository
         {
             return await _context.Prescriptions
                 .Include(p => p.Appointment)
+                .Include(p => p.LabBills)
                 .Include(p => p.PrescribedMedicines)
                     .ThenInclude(pm => pm.Medicine)
+               //.Where(p => p.PrescribedMedicines.Any(pm => !pm.IsIssued)) // Exclude issued
                 .ToListAsync();
         }
+
 
         #endregion
 
@@ -141,22 +144,34 @@ namespace MediCareCMSWebApi.Repository
             await _context.SaveChangesAsync();
         }
 
-        public async Task<List<BillHistory>> GetBillHistoryAsync()
+        public async Task<List<PharmacyBillHistoryViewModel>> GetAllPharmacyBillsAsync()
         {
-            return await _context.LabBills
-                .Select(b => new BillHistory
+            var bills = await _context.PharmacyBills
+                .Include(pb => pb.Prescription)
+                    .ThenInclude(pr => pr.Appointment)
+                        .ThenInclude(ap => ap.Doctor)
+                .Include(pb => pb.Prescription)
+                    .ThenInclude(pr => pr.Appointment)
+                        .ThenInclude(ap => ap.Patient)
+                .Include(pb => pb.Pharmacist)
+                .Select(pb => new PharmacyBillHistoryViewModel
                 {
-                    LabBillId = b.LabBillId,
-                    LabBillNumber = b.LabBillNumber,
-                    PatientName = b.Patient.FirstName + " " + b.Patient.LastName,
-                    DoctorName = b.Doctor.FirstName + " " + b.Doctor.LastName,
-                    TotalAmount = b.TotalAmount,
-                    IssuedDate = b.IssuedDate,
-                    IsPaid = b.IsPaid
+                    PharmacyId = pb.PharmacyId,
+                    PharmacyBillId = pb.PharmacyBillId,
+                    PatientName = pb.Prescription.Appointment.Patient.FirstName + " " +
+                                  pb.Prescription.Appointment.Patient.LastName,
+                    DoctorName = pb.Prescription.Appointment.Doctor.FirstName + " " +
+                                 pb.Prescription.Appointment.Doctor.LastName,
+                    PharmacistName = pb.Pharmacist.FirstName + " " +
+                                     pb.Pharmacist.LastName,
+                    TotalAmount = pb.TotalAmount ?? 0,
+                    IssuedDate = pb.IssuedDate,
+                    IsIssued = pb.IsIssued ?? false
                 })
                 .ToListAsync();
-        }
 
+            return bills;
+        }
 
     }
 }

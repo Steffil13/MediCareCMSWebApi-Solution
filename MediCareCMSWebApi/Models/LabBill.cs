@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MediCareCMSWebApi.Models;
 
@@ -14,6 +15,7 @@ public partial class LabBill
     public int PrescriptionId { get; set; }
 
     public int DoctorId { get; set; }
+    [NotMapped]
 
     public int? LabTechnicianId { get; set; }
 
@@ -22,6 +24,8 @@ public partial class LabBill
     public DateTime? IssuedDate { get; set; }
 
     public bool? IsPaid { get; set; }
+    [NotMapped]
+    public bool? IsIssued { get; set; }
 
     public virtual Doctor Doctor { get; set; } = null!;
 

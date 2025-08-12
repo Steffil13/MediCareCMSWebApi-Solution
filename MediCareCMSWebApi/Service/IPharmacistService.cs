@@ -44,7 +44,7 @@ namespace MediCareCMSWebApi.Service
 
         Task<bool> IssueMedicineAsync(int prescribedMedicineId);
 
-        Task<List<BillHistory>> GetBillHistoryAsync();
+        Task<IEnumerable<PharmacyBillHistoryViewModel>> GetAllPharmacyBillsAsync();
 
         Task<IEnumerable<MedicineInventory>> GetAllMedicinesAsync();
 

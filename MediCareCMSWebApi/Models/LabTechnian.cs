@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MediCareCMSWebApi.Models;
 
 public partial class LabTechnian
 {
+    [NotMapped]
     public int LabTechnianId { get; set; }
 
     public string? EmployeeId { get; set; }
