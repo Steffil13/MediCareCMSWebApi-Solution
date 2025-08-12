@@ -48,7 +48,7 @@ namespace MediCareCMSWebApi.Repository
                 .FirstOrDefaultAsync();
         }
 
-        public async Task AddAsync(BillingDto billingDto)
+        public async Task<int> AddAsync(BillingDto billingDto)
         {
             var bill = new ConsultationBill
             {
@@ -63,9 +63,10 @@ namespace MediCareCMSWebApi.Repository
 
             await _context.ConsultationBills.AddAsync(bill);
             await _context.SaveChangesAsync();
+            return bill.BillId;
 
             // Optional: set generated ID back to DTO
-            billingDto.BillId = bill.BillId;
+            //billingDto.BillId = bill.BillId;
         }
     }
 }

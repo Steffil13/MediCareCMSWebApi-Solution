@@ -22,9 +22,9 @@ namespace MediCareCMSWebApi.Service
             return _billingRepository.GetByIdAsync(id);
         }
 
-        public Task <int> AddBillingAsync(BillingDto billing)
+        public Task<int>  AddBillingAsync(BillingDto billing)
         {
-            return (Task<int>)_billingRepository.AddAsync(billing);
+            return _billingRepository.AddAsync(billing);
         }
     }
 

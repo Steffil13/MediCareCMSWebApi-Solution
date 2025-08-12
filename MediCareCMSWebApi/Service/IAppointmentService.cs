@@ -8,7 +8,7 @@ namespace MediCareCMSWebApi.Service
         Task<IEnumerable<AppointmentDto>> GetAppointmentsByPatientIdAsync(int patientId);
         Task<Appointment> GetAppointmentByIdAsync(int appointmentId);
         Task<List<AppointmentDto>> GetAppointmentsForDoctorAsync(int doctorId);
-        Task<bool> ScheduleAppointmentAsync(Appointment appointment);
+        Task<int> ScheduleAppointmentAsync(Appointment appointment);
         Task<bool> UpdateAppointmentAsync(int AppointmentId, Appointment appointment);
         Task<bool> DeleteAppointmentAsync(int appointmentId);
         Task<int> ScheduleAppointmentAsync(AppointmentViewModel dto);

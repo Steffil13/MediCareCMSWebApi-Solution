@@ -6,6 +6,6 @@ namespace MediCareCMSWebApi.Repository
     {
         Task<IList<BillingDto>> GetAllAsync();
         Task<BillingDto?> GetByIdAsync(int id);
-        Task AddAsync(BillingDto billing);
+        Task<int> AddAsync(BillingDto billing);
     }
 }

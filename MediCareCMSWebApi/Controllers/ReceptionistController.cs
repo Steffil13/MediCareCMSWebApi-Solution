@@ -3,6 +3,7 @@ using MediCareCMSWebApi.Service;
 using MediCareCMSWebApi.ViewModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace MediCareCMSWebApi.Controllers
 {
@@ -13,18 +14,78 @@ namespace MediCareCMSWebApi.Controllers
         private readonly IPatientService _patientService;
         private readonly IAppointmentService _appointmentService;
         private readonly IBillingService _billingService;
+        private readonly MediCareDbContext _context;
 
         public ReceptionistController(
             IPatientService patientService,
             IAppointmentService appointmentService,
-            IBillingService billingService)
+            IBillingService billingService,
+            MediCareDbContext context)
         {
             _patientService = patientService;
             _appointmentService = appointmentService;
             _billingService = billingService;
+            _context = context;
         }
 
         // Patient Management
+
+        #region View All patients
+        [HttpGet("all-patients")]
+        public async Task<IActionResult> GetAllPatients()
+        {
+            var patients = await _patientService.GetAllPatientsAsync();
+            return Ok(patients);
+        }
+        #endregion
+
+        // GET api/receptionist/patients/search?registerNumber=12345
+        [HttpGet("patients/search")]
+        public async Task<IActionResult> SearchPatientsByRegisterNumber([FromQuery] string registerNumber)
+        {
+            if (string.IsNullOrWhiteSpace(registerNumber))
+            {
+                return BadRequest("Register number is required.");
+            }
+
+            var patients = await _context.Patients
+                .Where(p => p.RegisterNumber.Contains(registerNumber))
+                .ToListAsync();
+
+            if (patients == null || patients.Count == 0)
+            {
+                return NotFound("No patients found with this register number.");
+            }
+
+            return Ok(patients);
+        }
+
+        // GET: api/receptionist/doctors/by-department/5
+        [HttpGet("doctors/by-department/{departmentId}")]
+        public async Task<IActionResult> GetDoctorsByDepartment(int departmentId)
+        {
+            if (departmentId <= 0)
+            {
+                return BadRequest("Invalid department ID.");
+            }
+
+            var doctors = await _context.Doctors
+                .Where(d => d.DepartmentId == departmentId)
+                .Select(d => new
+                {
+                    doctorId = d.DoctorId,
+                    doctorName = d.FirstName,
+                    departmentId = d.DepartmentId
+                })
+                .ToListAsync();
+
+            if (doctors == null || doctors.Count == 0)
+            {
+                return NotFound("No doctors found for this department.");
+            }
+
+            return Ok(doctors);
+        }
 
         [HttpPost("patients")]
         public async Task<ActionResult> RegisterPatient([FromBody] PatientDto patient)
@@ -94,17 +155,37 @@ namespace MediCareCMSWebApi.Controllers
 
             try
             {
-                var appointmentId = await _appointmentService.ScheduleAppointmentAsync(appointmentDto);
-                var appointment = await _appointmentService.GetAppointmentByIdAsync(appointmentId);
+                var appointment = new Appointment
+                {
+                    AppointmentDate = appointmentDto.AppointmentDate.Date,       // Strip time if needed
+                    AppointmentTime = !string.IsNullOrWhiteSpace(appointmentDto.AppointmentTime)
+                        ? appointmentDto.AppointmentTime
+                        : throw new ArgumentException("AppointmentTime is required."),
+                    TokenNumber = appointmentDto.TokenNumber,
+                    PatientId = appointmentDto.PatientId,
+                    DoctorId = appointmentDto.DoctorId,
+                    ReceptionistId = appointmentDto.ReceptionistId,
+                    AppointmentNumber = appointmentDto.AppointmentNumber
+                };
 
-                return CreatedAtAction(nameof(GetAppointmentById), new { id = appointmentId }, appointment);
+
+                var appointmentId = await _appointmentService.ScheduleAppointmentAsync(appointment);
+                var createdAppointment = await _appointmentService.GetAppointmentByIdAsync(appointmentId);
+
+                return CreatedAtAction(nameof(GetAppointmentById), new { id = appointmentId }, createdAppointment);
             }
             catch (InvalidOperationException ex)
             {
-                // Handle token limit or other business exceptions
                 return BadRequest(new { message = ex.Message });
             }
+            catch (Exception ex)
+            {
+                // Log exception
+                Console.WriteLine(ex);
+                return StatusCode(500, "An unexpected error occurred.");
+            }
         }
+
 
         // PUT: api/Receptionist/appointments/{id}
         [HttpPut("appointments/{id}")]

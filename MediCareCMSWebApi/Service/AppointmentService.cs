@@ -23,7 +23,7 @@ namespace MediCareCMSWebApi.Service
             return _repository.GetAppointmentByIdAsync(appointmentId);
         }
 
-        public Task<bool> ScheduleAppointmentAsync(Appointment appointment)
+        public Task<int> ScheduleAppointmentAsync(Appointment appointment)
         {
             return _repository.ScheduleAppointmentAsync(appointment);
         }
