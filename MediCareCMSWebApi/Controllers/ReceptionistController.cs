@@ -155,13 +155,19 @@ namespace MediCareCMSWebApi.Controllers
 
             try
             {
+                var dateOnly = appointmentDto.AppointmentDate.Date;
+
+                int existingCount = _context.Appointments
+                                .Count(a => a.DoctorId == appointmentDto.DoctorId && a.AppointmentDate.Date == dateOnly);
+
+                var tokenNumber = existingCount + 1;
                 var appointment = new Appointment
                 {
                     AppointmentDate = appointmentDto.AppointmentDate.Date,       // Strip time if needed
                     AppointmentTime = !string.IsNullOrWhiteSpace(appointmentDto.AppointmentTime)
                         ? appointmentDto.AppointmentTime
                         : throw new ArgumentException("AppointmentTime is required."),
-                    TokenNumber = appointmentDto.TokenNumber,
+                    TokenNumber = tokenNumber,
                     PatientId = appointmentDto.PatientId,
                     DoctorId = appointmentDto.DoctorId,
                     ReceptionistId = appointmentDto.ReceptionistId,
