@@ -92,6 +92,13 @@ namespace MediCareCMSWebApi.Service
             var prescription = await _pharmacistRepository.GetPrescriptionByIdAsync(id);
             if (prescription == null) return null;
 
+
+            //var prescribedMedicine = await _pharmacistRepository.GetPrescribedMedicineByIdAsync(id);
+
+            //prescribedMedicine.IsIssued = true;
+
+            //await _pharmacistRepository.UpdatePrescribedMedicineAsync(prescribedMedicine);
+
             return new PrescriptionViewModel
             {
                 PrescriptionId = prescription.PrescriptionId,
@@ -109,6 +116,8 @@ namespace MediCareCMSWebApi.Service
                     
 
                 }).ToList()
+
+                
             };
         }
 
@@ -206,14 +215,7 @@ namespace MediCareCMSWebApi.Service
 
             if (bill == null) return null;
 
-            return new PharmacyBillViewModel
-            {
-                PharmacyBillId = bill.PharmacyBillId ?? string.Empty,
-                PmedicineId = bill.PmedicineId ?? 0,
-                PrescriptionId = bill.PrescriptionId ?? 0,
-                PharmacistId = bill.PharmacistId ?? 0,
-                TotalAmount = bill.TotalAmount ?? 0m
-            };
+            return bill;
         }
         public async Task<IEnumerable<PatientHistoryViewModel>> GetAllPatientHistoriesAsync()
         {

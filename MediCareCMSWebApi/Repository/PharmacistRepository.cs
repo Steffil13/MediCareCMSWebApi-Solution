@@ -132,11 +132,35 @@ namespace MediCareCMSWebApi.Repository
         }
 
 
-        public async Task<PharmacyBill?> GetBillByPrescribedMedicineIdAsync(int pmId)
+        public async Task<PharmacyBillViewModel?> GetBillByPrescribedMedicineIdAsync(int pmId)
         {
             return await _context.PharmacyBills
-                .FirstOrDefaultAsync(b => b.PmedicineId == pmId);
+                .Include(p => p.Prescription)
+                    .ThenInclude(pt => pt.Appointment)
+                        .ThenInclude(a => a.Doctor)
+                .Include(p => p.Prescription)
+                    .ThenInclude(ap => ap.Appointment)
+                        .ThenInclude(a => a.Patient)
+                .Include(p => p.Prescription)
+                    .ThenInclude(pm => pm.PrescribedMedicines)
+                        .ThenInclude(m => m.Medicine)
+                .Where(b => b.PmedicineId == pmId)
+                .Select(b => new PharmacyBillViewModel
+                {
+                    PharmacyBillId = b.PharmacyBillId,
+                    DoctorName = b.Prescription.Appointment.Doctor.FirstName + " " +
+                                 b.Prescription.Appointment.Doctor.LastName,
+                    PatientName = b.Prescription.Appointment.Patient.FirstName + " " +
+                                  b.Prescription.Appointment.Patient.LastName,
+                    Medicines = b.Prescription.PrescribedMedicines
+                        .Select(pm => pm.Medicine.MedicineName)
+                        .ToList(),
+                    TotalAmount = b.TotalAmount,
+                    IssuedDate = b.IssuedDate
+                })
+                .FirstOrDefaultAsync();
         }
+
 
         public async Task AddPharmacyBillAsync(PharmacyBill bill)
         {

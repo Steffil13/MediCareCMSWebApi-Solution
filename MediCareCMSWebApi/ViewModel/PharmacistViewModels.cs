@@ -92,8 +92,12 @@
         public int PrescriptionId { get; set; }
         public int PmedicineId { get; set; }
         public int PharmacistId { get; set; }
-        public decimal TotalAmount { get; set; }
+        public decimal? TotalAmount { get; set; }
         public string PharmacyBillId { get; set; } = string.Empty;
+        public string DoctorName { get; set; }
+        public string PatientName { get; set; }
+        public List<string> Medicines { get; set; }
+        public DateTime? IssuedDate { get; set; }
     }
 
 

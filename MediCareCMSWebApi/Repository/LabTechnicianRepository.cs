@@ -56,6 +56,9 @@ namespace MediCareCMSWebApi.Repository
             var values = await _context.LabBills
                 .Include(a=> a.Doctor)
                 .Include(a=> a.Patient)
+                .Include(a=> a.Prescription)
+                    .ThenInclude(p=> p.PrescribedLabTests)
+                    .ThenInclude(pm=>pm.Lab)
                 .FirstOrDefaultAsync(d => d.LabBillId == id);
             return values;
         }

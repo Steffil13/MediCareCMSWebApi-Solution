@@ -53,7 +53,7 @@ namespace MediCareCMSWebApi.Repository
 
         Task<IEnumerable<MedicineInventory>> GetAllMedicinesAsync();
 
-        Task<PharmacyBill?> GetBillByPrescribedMedicineIdAsync(int pmId);
+        Task<PharmacyBillViewModel?> GetBillByPrescribedMedicineIdAsync(int pmId);
         Task AddPharmacyBillAsync(PharmacyBill bill);
 
     }
